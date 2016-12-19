@@ -1,0 +1,54 @@
+<!--
+  ~ Copyright 2016 ThoughtWorks, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[ldap_url].$error.server}">URI:<span class='asterix'>*</span></label>
+    <textarea ng-class="{'is-invalid-input': GOINPUTNAME[ldap_url].$error.server}" type="text" ng-model="ldap_url" ng-required="true" placeholder="ldap://your.first.uri:port"></textarea>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ldap_url].$error.server}" ng-show="GOINPUTNAME[ldap_url].$error.server">{{GOINPUTNAME[ldap_url].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[search_base].$error.server}">Search Base:<span class='asterix'>*</span></label>
+    <textarea ng-class="{'is-invalid-input': GOINPUTNAME[search_base].$error.server}" type="text" ng-model="search_base" ng-required="true" rows="3" placeholder=""></textarea>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[search_base].$error.server}" ng-show="GOINPUTNAME[search_base].$error.server">{{GOINPUTNAME[search_base].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[manager_dn].$error.server}">Manager DN:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[manager_dn].$error.server}" type="text" ng-model="manager_dn" ng-required="true"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[manager_dn].$error.server}" ng-show="GOINPUTNAME[manager_dn].$error.server">{{GOINPUTNAME[manager_dn].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[password].$error.server}">password:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[password].$error.server}" type="password" ng-model="password" ng-required="true"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[password].$error.server}" ng-show="GOINPUTNAME[password].$error.server">{{GOINPUTNAME[password].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[search_filter].$error.server}">Search Filter:<span class='asterix'>*</span></label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[search_filter].$error.server}" type="text" ng-model="search_filter" ng-required="true"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[search_filter].$error.server}" ng-show="GOINPUTNAME[search_filter].$error.server">{{GOINPUTNAME[search_filter].$error.server}}</span>
+</div>
+
+<div class="form_item_block">
+  <label ng-class="{'is-invalid-label': GOINPUTNAME[display_name_attribute].$error.server}">Display Name Attribute:<span class='asterix'>*</span></label>
+  <input ng-class="{'is-invalid-input': GOINPUTNAME[display_name_attribute].$error.server}" type="text" ng-model="display_name_attribute" ng-required="true"/>
+  <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[display_name_attribute].$error.server}" ng-show="GOINPUTNAME[display_name_attribute].$error.server">{{GOINPUTNAME[display_name_attribute].$error.server}}</span>
+</div>
+
+
+
