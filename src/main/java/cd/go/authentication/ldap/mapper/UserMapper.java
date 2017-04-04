@@ -39,7 +39,7 @@ public class UserMapper extends AbstractMapper<User> {
     public User mapFromResult(Attributes attributes) throws NamingException {
         User user = new User(resolveAttribute(usernameAttribute, attributes),
                 resolveAttribute(displayNameAttribute, attributes),
-                resolveAttribute(emailAttribute, attributes),attributes);
+                resolveAttribute(emailAttribute, attributes), attributes);
 
         return user;
     }

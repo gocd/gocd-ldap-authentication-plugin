@@ -166,7 +166,8 @@ public class LdapConfiguration {
         if (searchBases != null ? !searchBases.equals(that.searchBases) : that.searchBases != null) return false;
         if (managerDn != null ? !managerDn.equals(that.managerDn) : that.managerDn != null) return false;
         if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        if (searchAttributes != null ? !searchAttributes.equals(that.searchAttributes) : that.searchAttributes != null) return false;
+        if (searchAttributes != null ? !searchAttributes.equals(that.searchAttributes) : that.searchAttributes != null)
+            return false;
         if (loginAttribute != null ? !loginAttribute.equals(that.loginAttribute) : that.loginAttribute != null)
             return false;
         if (displayNameAttribute != null ? !displayNameAttribute.equals(that.displayNameAttribute) : that.displayNameAttribute != null)

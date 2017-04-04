@@ -16,8 +16,8 @@
 
 package cd.go.authentication.ldap.executor;
 
-import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.exception.InvalidProfileException;
+import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.Ldap;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;

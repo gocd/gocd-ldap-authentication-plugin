@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 public class BaseTest {
     protected LdapConfiguration ldapConfiguration;
+
     @Before
     public void setup() {
         ldapConfiguration = mock(LdapConfiguration.class);
