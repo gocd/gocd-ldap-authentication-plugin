@@ -19,61 +19,90 @@ This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server
 * Example profile
  
 ```xml
-<authConfigs>
-  <authConfig id="profile-id" pluginId="cd.go.authentication.ldap">
-    <property>
-      <key>Url</key>
-      <value>ldap://ldap-server-url</value>
-    </property>
-    <property>
-      <key>ManagerDN</key>
-      <value>your-manager-dn</value>
-    </property>
-    <property>
-      <key>Password</key>
-      <value>manager-password</value>
-    </property>
-    <property>
-      <key>SearchBases</key>
-      <value>your-user-search-base</value>
-    </property>
-    <property>
-      <key>SearchFilter</key>
-      <value>your-authentication-attribute</value>
-    </property>
-    <property>
-      <key>DisplayNameAttribute</key>
-      <value>displayName</value>
-    </property>
-    <property>
-      <key>EmailAttribute</key>
-      <value>mail</value>
-    </property>
-  </authConfig>
-</authConfigs>
-``` 
+    <authConfigs>
+      <authConfig id="profile-id" pluginId="cd.go.authentication.ldap">
+        <property>
+          <key>Url</key>
+          <value>ldap://ldap-server-url</value>
+        </property>
+        <property>
+          <key>ManagerDN</key>
+          <value>your-manager-dn</value>
+        </property>
+        <property>
+          <key>Password</key>
+          <value>manager-password</value>
+        </property>
+        <property>
+          <key>SearchBases</key>
+          <value>your-user-search-base</value>
+        </property>
+        <property>
+          <key>LoginAttribute</key>
+          <value>login-attribute</value>
+        </property>
+        <property>
+          <key>SearchAttributes</key>
+          <value>search-attributes</value>
+        </property>
+        <property>
+          <key>DisplayNameAttribute</key>
+          <value>displayName</value>
+        </property>
+        <property>
+          <key>EmailAttribute</key>
+          <value>mail</value>
+        </property>
+      </authConfig>
+    </authConfigs>
+```  
 * **Url:** Specify your ldap server URL
 * **ManagerDN:** Specify full mangerDN
  
-    ```xml 
-    <value>uid=admin,ou=system,dc=example,dc=com</value> 
+    ```xml
+    <property>
+       <key>ManagerDN</key>
+       <value>uid=admin,ou=system,dc=example,dc=com</value>
+    </property>
     ```
 * **Password:** Specify manager password
 * **SearchBases:** Provide user search base of your ldap server. You can provide multiple search bases
 
     > Single search base: 
-    ```xml 
-    <value>ou=users,ou=system</value> 
+    ```xml
+    <property>
+       <key>SearchBases</key>
+       <value>ou=users,ou=system</value>
+    </property>
     ```
     
     > Multiple search base
-    ```xml 
-    <value>
+    ```xml
+    <property>
+       <key>SearchBases</key>
+       <value>
         ou=users,ou=system
         ou=employee,ou=system
-    </value> 
+        </value>
+    </property>
     ```
-* **SearchFilter:** This attribute represents the ldap `username`
+* **LoginAttribute:** This is a mandatory field which is required to uniquely identity a user in the ldap server.  
+    
+    ```xml
+    <property>
+       <key>LoginAttribute</key>
+       <value>sAMAccountName</value>
+    </property>
+    ```
+    
+* **SearchAttributes:** SearchAttributes can be used to configure user search to look for certain attributes.    
+    ```xml
+    <property>
+       <key>SearchAttributes</key>
+       <value>mail, name, sn, l</value>
+    </property>
+    ```
+  
 * **DisplayNameAttribute:** Value of this attribute is displayed on GoCD user profile
 * **EmailAttribute:** This allows user to map custom `email` field of their LDAP server.
  
@@ -84,7 +113,6 @@ This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server
 ...
 </authConfig>
 ```
-
 
 ## License
 
