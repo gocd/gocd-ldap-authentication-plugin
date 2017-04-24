@@ -36,18 +36,18 @@ public class Ldap {
         this.ldapConfiguration = ldapConfiguration;
     }
 
-    private static DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
+    private DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
         Hashtable environments = new Environment(ldapConfiguration, true).getEnvironments();
         environments.put(Context.SECURITY_PRINCIPAL, username);
         environments.put(Context.SECURITY_CREDENTIALS, password);
         return new InitialDirContext(environments);
     }
 
-    private static void authenticate(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
+    private void authenticate(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
         getDirContext(ldapConfiguration, username, password).close();
     }
 
-    public static void validate(LdapConfiguration ldapConfiguration) throws NamingException {
+    public void validate() throws NamingException {
         authenticate(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
     }
 
