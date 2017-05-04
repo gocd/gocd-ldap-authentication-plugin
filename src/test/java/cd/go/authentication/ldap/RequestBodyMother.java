@@ -84,8 +84,8 @@ public class RequestBodyMother {
                 "    \"ManagerDN\": \"uid=admin,ou=system\",\n" +
                 "    \"DisplayNameAttribute\": \"displayName\",\n" +
                 "    \"SearchBases\": \"%s\",\n" +
-                "    \"SearchAttributes\": \"%s\",\n" +
-                "    \"LoginAttribute\": \"uid\",\n" +
+                "    \"UserSearchFilter\": \"%s\",\n" +
+                "    \"UserLoginFilter\": \"uid\",\n" +
                 "    \"Url\": \"ldap://localhost:10389\",\n" +
                 "    \"Password\": \"secret\"\n" +
                 "  }\n" +

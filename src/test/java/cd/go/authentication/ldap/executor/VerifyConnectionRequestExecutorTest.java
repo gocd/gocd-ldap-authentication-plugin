@@ -48,7 +48,8 @@ public class VerifyConnectionRequestExecutorTest {
 
         GoPluginApiResponse response = new VerifyConnectionRequestExecutor(request).execute();
 
-        String expectedResponse = "{\"message\":\"Validation failed for the given Auth Config\",\"errors\":[{\"message\":\"EmailAttribute must not be blank.\",\"key\":\"EmailAttribute\"}],\"status\":\"validation-failed\"}";
+        String expectedResponse = "{\"message\":\"Validation failed for the given Auth Config\",\"errors\":[{\"message\":\"UserLoginFilter must not be blank.\",\"key\":\"UserLoginFilter\"}],\"status\":\"validation-failed\"}";
+
         assertThat(response.responseBody(), is(expectedResponse));
     }
 
@@ -85,8 +86,8 @@ public class VerifyConnectionRequestExecutorTest {
                 "    \"ManagerDN\": \"uid=admin,ou=system\",\n" +
                 "    \"DisplayNameAttribute\": \"displayName\",\n" +
                 "    \"SearchBases\": \"search_base\",\n" +
-                "    \"SearchAttributes\": \"attr\",\n" +
-                "    \"LoginAttribute\": \"uid\",\n" +
+                "    \"UserSearchFilter\": \"attr\",\n" +
+                "    \"UserLoginFilter\": \"uid\",\n" +
                 "    \"Url\": \"ldap://localhost:10389\",\n" +
                 "    \"Password\": \"secret\",\n" +
                 "    \"EmailAttribute\": \"email\"\n" +
@@ -98,8 +99,7 @@ public class VerifyConnectionRequestExecutorTest {
                 "    \"ManagerDN\": \"uid=admin,ou=system\",\n" +
                 "    \"DisplayNameAttribute\": \"displayName\",\n" +
                 "    \"SearchBases\": \"search_base\",\n" +
-                "    \"SearchAttributes\": \"attr\",\n" +
-                "    \"LoginAttribute\": \"uid\",\n" +
+                "    \"UserSearchFilter\": \"attr\",\n" +
                 "    \"Url\": \"ldap://localhost:10389\",\n" +
                 "    \"Password\": \"secret\"\n" +
                 "}";

@@ -16,6 +16,7 @@
 
 package cd.go.authentication.ldap;
 
+import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import org.junit.Before;
 
@@ -35,9 +36,9 @@ public class BaseTest {
         when(ldapConfiguration.getSearchBases()).thenReturn(Arrays.asList("ou=users,ou=system"));
         when(ldapConfiguration.getManagerDn()).thenReturn("uid=admin,ou=system");
         when(ldapConfiguration.getPassword()).thenReturn("secret");
-        when(ldapConfiguration.getLoginAttribute()).thenReturn("uid");
+        when(ldapConfiguration.getUserLoginFilter()).thenReturn("uid");
         when(ldapConfiguration.getDisplayNameAttribute()).thenReturn("displayName");
         when(ldapConfiguration.getEmailAttribute()).thenReturn("mail");
-        when(ldapConfiguration.getUserMapper()).thenCallRealMethod();
+        when(ldapConfiguration.getUserMapper(new UsernameResolver())).thenCallRealMethod();
     }
 }

@@ -47,10 +47,6 @@ public class User {
         this.displayName = displayName;
         this.emailId = emailId == null ? null : emailId.toLowerCase().trim();
         this.attributes = attributes;
-
-        if (StringUtils.isBlank(this.username)) {
-            throw new InvalidUsernameException("Username can not be blank. Please check `SearchFilter` attribute on `<authConfig>` profile.");
-        }
     }
 
     public String getUsername() {

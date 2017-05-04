@@ -19,6 +19,7 @@ package cd.go.authentication.ldap.model;
 import cd.go.authentication.ldap.annotation.MetadataHelper;
 import cd.go.authentication.ldap.annotation.ProfileField;
 import cd.go.authentication.ldap.mapper.UserMapper;
+import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.utils.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
@@ -32,9 +33,10 @@ import java.util.List;
 import java.util.Map;
 
 import static cd.go.authentication.ldap.utils.Util.GSON;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class LdapConfiguration {
-    private static final List<String> DEFAULT_SEARCH_FILTER_ATTRIBUTES = Arrays.asList("sAMAccountName", "uid", "cn", "userPrincipalName", "mail", "otherMailbox");
+    private static final String DEFAULT_USER_SEARCH_FILTER = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";
 
     @Expose
     @SerializedName("Url")
@@ -57,23 +59,23 @@ public class LdapConfiguration {
     private String password;
 
     @Expose
-    @SerializedName("SearchAttributes")
-    @ProfileField(key = "SearchAttributes", required = false, secure = false)
-    private String searchAttributes;
+    @SerializedName("UserSearchFilter")
+    @ProfileField(key = "UserSearchFilter", required = false, secure = false)
+    private String userSearchFilter;
 
     @Expose
-    @SerializedName("LoginAttribute")
-    @ProfileField(key = "LoginAttribute", required = true, secure = false)
-    private String loginAttribute;
+    @SerializedName("UserLoginFilter")
+    @ProfileField(key = "UserLoginFilter", required = true, secure = false)
+    private String userLoginFilter;
 
     @Expose
     @SerializedName("DisplayNameAttribute")
-    @ProfileField(key = "DisplayNameAttribute", required = true, secure = false)
+    @ProfileField(key = "DisplayNameAttribute", required = false, secure = false)
     private String displayNameAttribute;
 
     @Expose
     @SerializedName("EmailAttribute")
-    @ProfileField(key = "EmailAttribute", required = true, secure = false)
+    @ProfileField(key = "EmailAttribute", required = false, secure = false)
     private String emailAttribute;
 
     @Expose
@@ -115,25 +117,24 @@ public class LdapConfiguration {
         return password;
     }
 
-    public String getLoginAttribute() {
-        return loginAttribute;
+    public String getUserLoginFilter() {
+        return userLoginFilter;
     }
 
-    public List<String> getSearchAttributes() {
-        final List<String> filters = Util.listFromCommaSeparatedString(this.searchAttributes);
-        return filters.isEmpty() ? DEFAULT_SEARCH_FILTER_ATTRIBUTES : filters;
+    public String getUserSearchFilter() {
+        return isBlank(this.userSearchFilter) ? DEFAULT_USER_SEARCH_FILTER : this.userSearchFilter;
     }
 
     public String getDisplayNameAttribute() {
-        return displayNameAttribute;
+        return isBlank(this.displayNameAttribute) ? "cn" : this.displayNameAttribute;
     }
 
     public String getEmailAttribute() {
-        return StringUtils.isBlank(emailAttribute) ? "mail" : emailAttribute;
+        return isBlank(emailAttribute) ? "mail" : emailAttribute;
     }
 
-    public UserMapper getUserMapper() {
-        return new UserMapper(getLoginAttribute(), getDisplayNameAttribute(), getEmailAttribute());
+    public UserMapper getUserMapper(UsernameResolver resolver) {
+        return new UserMapper(resolver, getDisplayNameAttribute(), getEmailAttribute());
     }
 
     public int getLdapConnectionPoolSize() {
@@ -166,9 +167,9 @@ public class LdapConfiguration {
         if (searchBases != null ? !searchBases.equals(that.searchBases) : that.searchBases != null) return false;
         if (managerDn != null ? !managerDn.equals(that.managerDn) : that.managerDn != null) return false;
         if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        if (searchAttributes != null ? !searchAttributes.equals(that.searchAttributes) : that.searchAttributes != null)
+        if (userSearchFilter != null ? !userSearchFilter.equals(that.userSearchFilter) : that.userSearchFilter != null)
             return false;
-        if (loginAttribute != null ? !loginAttribute.equals(that.loginAttribute) : that.loginAttribute != null)
+        if (userLoginFilter != null ? !userLoginFilter.equals(that.userLoginFilter) : that.userLoginFilter != null)
             return false;
         if (displayNameAttribute != null ? !displayNameAttribute.equals(that.displayNameAttribute) : that.displayNameAttribute != null)
             return false;
@@ -181,8 +182,8 @@ public class LdapConfiguration {
         result = 31 * result + (searchBases != null ? searchBases.hashCode() : 0);
         result = 31 * result + (managerDn != null ? managerDn.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (searchAttributes != null ? searchAttributes.hashCode() : 0);
-        result = 31 * result + (loginAttribute != null ? loginAttribute.hashCode() : 0);
+        result = 31 * result + (userSearchFilter != null ? userSearchFilter.hashCode() : 0);
+        result = 31 * result + (userLoginFilter != null ? userLoginFilter.hashCode() : 0);
         result = 31 * result + (displayNameAttribute != null ? displayNameAttribute.hashCode() : 0);
         result = 31 * result + (emailAttribute != null ? emailAttribute.hashCode() : 0);
         result = 31 * result + ldapConnectionPoolSize;

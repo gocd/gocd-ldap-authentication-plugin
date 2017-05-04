@@ -59,20 +59,12 @@ public class AuthConfigValidateRequestExecutorTest {
                 "    \"key\": \"ManagerDN\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"LoginAttribute must not be blank.\",\n" +
-                "    \"key\": \"LoginAttribute\"\n" +
+                "    \"message\": \"UserLoginFilter must not be blank.\",\n" +
+                "    \"key\": \"UserLoginFilter\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"message\": \"Password must not be blank.\",\n" +
                 "    \"key\": \"Password\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"DisplayNameAttribute must not be blank.\",\n" +
-                "    \"key\": \"DisplayNameAttribute\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"EmailAttribute must not be blank.\",\n" +
-                "    \"key\": \"EmailAttribute\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"key\": \"foo\",\n" +
@@ -103,20 +95,12 @@ public class AuthConfigValidateRequestExecutorTest {
                 "    \"key\": \"ManagerDN\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"LoginAttribute must not be blank.\",\n" +
-                "    \"key\": \"LoginAttribute\"\n" +
+                "    \"message\": \"UserLoginFilter must not be blank.\",\n" +
+                "    \"key\": \"UserLoginFilter\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"message\": \"Password must not be blank.\",\n" +
                 "    \"key\": \"Password\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"DisplayNameAttribute must not be blank.\",\n" +
-                "    \"key\": \"DisplayNameAttribute\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"EmailAttribute must not be blank.\",\n" +
-                "    \"key\": \"EmailAttribute\"\n" +
                 "  }\n" +
                 "]";
         JSONAssert.assertEquals(expectedJSON, json, JSONCompareMode.NON_EXTENSIBLE);

@@ -31,6 +31,7 @@ import java.util.List;
 
 public class Ldap {
     private LdapConfiguration ldapConfiguration;
+    private final int MAX_AUTHENTICATION_RESULT = 1;
 
     public Ldap(LdapConfiguration ldapConfiguration) {
         this.ldapConfiguration = ldapConfiguration;
@@ -60,9 +61,8 @@ public class Ldap {
     }
 
     public <T> T authenticate(String username, String password, AbstractMapper<T> mapper) throws NamingException {
-        Filter filter = new EqualsFilter(ldapConfiguration.getLoginAttribute(), username);
+        NamingEnumeration<SearchResult> results = search(ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT);
 
-        NamingEnumeration<SearchResult> results = search(filter, 1);
         if (results == null || !results.hasMore())
             throw new RuntimeException("User " + username + " is not exist in " + ldapConfiguration.getLdapUrl());
 
@@ -79,9 +79,9 @@ public class Ldap {
         return null;
     }
 
-    public <T> List<T> search(Filter filter, AbstractMapper<T> mapper, int maxResult) throws NamingException {
+    public <T> List<T> search(String filter, Object[] filterArgs, AbstractMapper<T> mapper, int maxResult) throws NamingException {
         List<T> results = new ArrayList<T>();
-        NamingEnumeration<SearchResult> searchResults = search(filter, maxResult);
+        NamingEnumeration<SearchResult> searchResults = search(filter, filterArgs, maxResult);
         if (searchResults == null)
             return results;
 
@@ -90,10 +90,6 @@ public class Ldap {
         }
         searchResults.close();
         return results;
-    }
-
-    public <T> List<T> search(Filter filter, AbstractMapper<T> mapper) throws NamingException {
-        return search(filter, mapper, 0);
     }
 
     public <T> List<T> searchGroup(String searchBase, String filter, AbstractMapper<T> mapper) throws NamingException {
@@ -108,10 +104,10 @@ public class Ldap {
         return results;
     }
 
-    private NamingEnumeration<SearchResult> search(Filter filter, int maxResult) throws NamingException {
+    private NamingEnumeration<SearchResult> search(String filter, Object[] filterArgs, int maxResult) throws NamingException {
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
         for (String base : ldapConfiguration.getSearchBases()) {
-            NamingEnumeration<SearchResult> results = dirContext.search(base, filter.prepare(), getSimpleSearchControls(maxResult));
+            NamingEnumeration<SearchResult> results = dirContext.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
             if (results.hasMore())
                 return results;
         }

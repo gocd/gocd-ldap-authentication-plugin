@@ -17,6 +17,7 @@
 package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.mapper.AttributesMapper;
+import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.*;
 import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
@@ -52,7 +53,7 @@ public class LdapAuthenticator {
 
         try {
             Attributes attributes = ldap.authenticate(credentials.getUsername(), credentials.getPassword(), new AttributesMapper());
-            User user = configuration.getUserMapper().mapFromResult(attributes);
+            User user = configuration.getUserMapper(new UsernameResolver(credentials.getUsername())).mapFromResult(attributes);
             if (user != null) {
                 LdapPlugin.LOG.info("User `" + user.getUsername() + "` successfully authenticated using " + authConfigId);
                 return new AuthenticationResponse(user, authConfig);
