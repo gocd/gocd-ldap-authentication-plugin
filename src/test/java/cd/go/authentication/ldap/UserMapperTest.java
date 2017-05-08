@@ -18,6 +18,7 @@ package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.exception.InvalidUsernameException;
 import cd.go.authentication.ldap.mapper.UserMapper;
+import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.User;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,20 +44,33 @@ public class UserMapperTest {
         attributes.put("displayName", "Java Duke");
         attributes.put("mail", "jduke@example.com");
 
-        UserMapper userMapper = new UserMapper("uid", "displayName", "mail");
+        UserMapper userMapper = new UserMapper(new UsernameResolver(), "displayName", "mail");
         User user = userMapper.mapFromResult(attributes);
 
         assertThat(user, is(new User("jduke", "Java Duke", "jduke@example.com", null)));
     }
 
     @Test
+    public void shouldAbleToMapUserWithGivenUsername() throws Exception {
+        Attributes attributes = new BasicAttributes();
+        attributes.put("uid", "jduke");
+        attributes.put("displayName", "Java Duke");
+        attributes.put("mail", "jduke@example.com");
+
+        UserMapper userMapper = new UserMapper(new UsernameResolver("J Dude"), "displayName", "mail");
+        User user = userMapper.mapFromResult(attributes);
+
+        assertThat(user, is(new User("J Dude", "Java Duke", "jduke@example.com", null)));
+    }
+
+    @Test
     public void shouldBarfWhenMappingUsernameFromInvalidAttributes() throws Exception {
         Attributes attributes = new BasicAttributes();
         attributes.put("displayName", "Java Duke");
-        UserMapper userMapper = new UserMapper("non-exiting-field", "displayName", "mail");
+        UserMapper userMapper = new UserMapper(new UsernameResolver(), "displayName", "mail");
 
         thrown.expect(any(InvalidUsernameException.class));
-        thrown.expectMessage("Username can not be blank. Please check `SearchFilter` attribute on `<authConfig>` profile.");
+        thrown.expectMessage("Username can not be blank. Failed to resolve username using the attributes `sAMAccountName` and `uid`.");
         User user = userMapper.mapFromResult(attributes);
 
         assertNull(user);

@@ -73,14 +73,14 @@ public class GetAuthConfigMetadataExecutorTest {
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"SearchAttributes\",\n" +
+                "    \"key\": \"UserSearchFilter\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"key\": \"LoginAttribute\",\n" +
+                "    \"key\": \"UserLoginFilter\",\n" +
                 "    \"metadata\": {\n" +
                 "      \"required\": true,\n" +
                 "      \"secure\": false\n" +
@@ -89,14 +89,14 @@ public class GetAuthConfigMetadataExecutorTest {
                 "  {\n" +
                 "    \"key\": \"DisplayNameAttribute\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"key\": \"EmailAttribute\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  }\n" +

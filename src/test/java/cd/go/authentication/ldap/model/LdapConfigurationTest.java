@@ -34,8 +34,8 @@ public class LdapConfigurationTest {
                 "  \"DisplayNameAttribute\": \"displayName\",\n" +
                 "  \"SearchBases\": \"ou=users,ou=system\n" +
                 "  ou=employee,ou=system\",\n" +
-                "  \"LoginAttribute\": \"uid\",\n" +
-                "  \"SearchAttributes\": \"uid,cn\",\n" +
+                "  \"UserLoginFilter\": \"uid\",\n" +
+                "  \"UserSearchFilter\": \"(cn={0})\",\n" +
                 "  \"Url\": \"ldap://localhost:10389\",\n" +
                 "  \"Password\": \"secret\"\n" +
                 "}";
@@ -47,10 +47,10 @@ public class LdapConfigurationTest {
         assertThat(ldapConfiguration.getSearchBases(), contains("ou=users,ou=system", "ou=employee,ou=system"));
         assertThat(ldapConfiguration.getManagerDn(), is("uid=admin,ou=system"));
         assertThat(ldapConfiguration.getPassword(), is("secret"));
-        assertThat(ldapConfiguration.getLoginAttribute(), is("uid"));
+        assertThat(ldapConfiguration.getUserLoginFilter(), is("uid"));
         assertThat(ldapConfiguration.getDisplayNameAttribute(), is("displayName"));
         assertThat(ldapConfiguration.getEmailAttribute(), is("mail"));
-        assertThat(ldapConfiguration.getSearchAttributes(), contains("uid", "cn"));
+        assertThat(ldapConfiguration.getUserSearchFilter(), is("(cn={0})"));
     }
 
     @Test
@@ -61,8 +61,8 @@ public class LdapConfigurationTest {
                 "      \"ManagerDN\": \"manger-cred\",\n" +
                 "      \"DisplayNameAttribute\": \"displayName\",\n" +
                 "      \"SearchBases\": \"base1\",\n" +
-                "      \"SearchAttributes\": \"uid\",\n" +
-                "      \"LoginAttribute\": \"uid\",\n" +
+                "      \"UserSearchFilter\": \"uid\",\n" +
+                "      \"UserLoginFilter\": \"uid\",\n" +
                 "      \"Url\": \"url1\",\n" +
                 "      \"Password\": \"secret\"\n" +
                 "    },\n" +
@@ -70,8 +70,8 @@ public class LdapConfigurationTest {
                 "      \"ManagerDN\": \"manger-cred\",\n" +
                 "      \"DisplayNameAttribute\": \"displayName\",\n" +
                 "      \"SearchBases\": \"base2\",\n" +
-                "      \"LoginAttribute\": \"uid\",\n" +
-                "      \"SearchAttributes\": \"uid\",\n" +
+                "      \"UserLoginFilter\": \"uid\",\n" +
+                "      \"UserSearchFilter\": \"uid\",\n" +
                 "      \"Url\": \"url2\",\n" +
                 "      \"Password\": \"secret\"\n" +
                 "    }\n" +
@@ -89,7 +89,7 @@ public class LdapConfigurationTest {
         assertThat(ldapConfiguration1.getSearchBases(), contains("base1"));
         assertThat(ldapConfiguration1.getManagerDn(), is("manger-cred"));
         assertThat(ldapConfiguration1.getPassword(), is("secret"));
-        assertThat(ldapConfiguration1.getLoginAttribute(), is("uid"));
+        assertThat(ldapConfiguration1.getUserLoginFilter(), is("uid"));
         assertThat(ldapConfiguration1.getDisplayNameAttribute(), is("displayName"));
         assertThat(ldapConfiguration1.getEmailAttribute(), is("mail"));
 
@@ -97,7 +97,7 @@ public class LdapConfigurationTest {
         assertThat(ldapConfiguration2.getSearchBases(), contains("base2"));
         assertThat(ldapConfiguration2.getManagerDn(), is("manger-cred"));
         assertThat(ldapConfiguration2.getPassword(), is("secret"));
-        assertThat(ldapConfiguration2.getLoginAttribute(), is("uid"));
+        assertThat(ldapConfiguration2.getUserLoginFilter(), is("uid"));
         assertThat(ldapConfiguration2.getDisplayNameAttribute(), is("displayName"));
         assertThat(ldapConfiguration2.getEmailAttribute(), is("mail"));
     }

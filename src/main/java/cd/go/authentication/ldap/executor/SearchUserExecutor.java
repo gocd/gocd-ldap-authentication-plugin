@@ -17,6 +17,7 @@
 package cd.go.authentication.ldap.executor;
 
 import cd.go.authentication.ldap.LdapPlugin;
+import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
@@ -67,9 +68,8 @@ public class SearchUserExecutor implements RequestExecutor {
             try {
                 final LdapConfiguration configuration = authConfig.getConfiguration();
                 final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
-                OrFilter filter = getFilter(searchTerm, configuration.getSearchAttributes());
 
-                List<User> users = ldap.search(filter, configuration.getUserMapper(), 100);
+                List<User> users = ldap.search(configuration.getUserSearchFilter(), new String[] {searchTerm}, configuration.getUserMapper(new UsernameResolver()), 100);
                 allUsers.addAll(users);
                 if (users.size() == 100)
                     break;
@@ -78,14 +78,5 @@ public class SearchUserExecutor implements RequestExecutor {
             }
         }
         return allUsers;
-    }
-
-    private OrFilter getFilter(String searchTerm, List<String> filterAttributes) {
-        OrFilter filter = new OrFilter();
-        for (String attribute : filterAttributes) {
-            filter.or(new LikeFilter(attribute, searchTerm));
-        }
-
-        return filter;
     }
 }
