@@ -16,6 +16,7 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapPlugin;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
@@ -31,6 +32,8 @@ import javax.naming.NamingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
 
 public class VerifyConnectionRequestExecutor implements RequestExecutor {
         private final Gson GSON = new Gson();
@@ -71,8 +74,10 @@ public class VerifyConnectionRequestExecutor implements RequestExecutor {
                 ldap.validate();
             } catch (NamingException e) {
                 result.addError(new ValidationError(getErrorMessage(e)));
+                LOG.error("[Verify Connection] Verify connection failed with errors.", e);
             } catch (Exception e) {
                 result.addError(new ValidationError(e.getMessage()));
+                LOG.error("[Verify Connection] Verify connection failed with errors.", e);
             }
             return result;
         }

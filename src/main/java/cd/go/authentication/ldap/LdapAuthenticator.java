@@ -25,6 +25,8 @@ import cd.go.framework.ldap.LdapFactory;
 import javax.naming.directory.Attributes;
 import java.util.List;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
+
 public class LdapAuthenticator {
 
     private final LdapFactory ldapFactory;
@@ -52,14 +54,15 @@ public class LdapAuthenticator {
         final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
 
         try {
+            LOG.info(String.format("[Authenticate] Authenticating User: %s using auth_config: %s", credentials.getUsername(), authConfigId));
             Attributes attributes = ldap.authenticate(credentials.getUsername(), credentials.getPassword(), new AttributesMapper());
             User user = configuration.getUserMapper(new UsernameResolver(credentials.getUsername())).mapFromResult(attributes);
             if (user != null) {
-                LdapPlugin.LOG.info("User `" + user.getUsername() + "` successfully authenticated using " + authConfigId);
+                LOG.info(String.format("[Authenticate] User `%s` successfully authenticated using auth_config: %s", user.getUsername(), authConfigId));
                 return new AuthenticationResponse(user, authConfig);
             }
         } catch (Exception e) {
-            LdapPlugin.LOG.error("Failed to authenticate user " + credentials.getUsername() + " on " + configuration.getLdapUrl() + ". ", e);
+            LOG.error("[Authenticate] Failed to authenticate user " + credentials.getUsername() + " on " + configuration.getLdapUrl() + ". ", e);
         }
         return null;
     }

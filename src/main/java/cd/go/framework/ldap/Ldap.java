@@ -55,6 +55,7 @@ public class Ldap {
     private static SearchControls getSimpleSearchControls(int maxResult) {
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        searchControls.setTimeLimit(5000); // timeout after five seconds
         if (maxResult != 0)
             searchControls.setCountLimit(maxResult);
         return searchControls;
@@ -89,18 +90,6 @@ public class Ldap {
             results.add(mapper.mapFromResult(searchResults.next().getAttributes()));
         }
         searchResults.close();
-        return results;
-    }
-
-    public <T> List<T> searchGroup(String searchBase, String filter, AbstractMapper<T> mapper) throws NamingException {
-        List<T> results = new ArrayList<>();
-
-        DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
-        NamingEnumeration<SearchResult> searchResult = dirContext.search(searchBase, filter, getSimpleSearchControls(0));
-
-        while (searchResult.hasMore()) {
-            results.add(mapper.mapFromResult(searchResult.next().getAttributes()));
-        }
         return results;
     }
 

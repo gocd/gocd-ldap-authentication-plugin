@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static cd.go.authentication.ldap.utils.Util.GSON;
 
 public class SearchUserExecutor implements RequestExecutor {
@@ -68,13 +69,17 @@ public class SearchUserExecutor implements RequestExecutor {
             try {
                 final LdapConfiguration configuration = authConfig.getConfiguration();
                 final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
+                String userSearchFilter = configuration.getUserSearchFilter();
 
-                List<User> users = ldap.search(configuration.getUserSearchFilter(), new String[] {searchTerm}, configuration.getUserMapper(new UsernameResolver()), 100);
+                LOG.info(String.format("[User Search] Looking up for users matching search_term: `%s`" +
+                        " using the search_filter: `%s` and auth_config: `%s`", searchTerm, userSearchFilter, authConfig.getId()));
+
+                List<User> users = ldap.search(userSearchFilter, new String[] {searchTerm}, configuration.getUserMapper(new UsernameResolver()), 100);
                 allUsers.addAll(users);
                 if (users.size() == 100)
                     break;
             } catch (Exception e) {
-                LdapPlugin.LOG.error("Failed to search user using ldap profile `" + authConfig.getId() + "` ", e);
+                LOG.error(String.format("[User Search] Failed to search user using auth_config: `%s`", authConfig.getId()), e);
             }
         }
         return allUsers;
