@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class Ldap {
     private LdapConfiguration ldapConfiguration;
     private final int MAX_AUTHENTICATION_RESULT = 1;
@@ -39,8 +41,11 @@ public class Ldap {
 
     private DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
         Hashtable environments = new Environment(ldapConfiguration, true).getEnvironments();
-        environments.put(Context.SECURITY_PRINCIPAL, username);
-        environments.put(Context.SECURITY_CREDENTIALS, password);
+        if (isNotBlank(username)) {
+            environments.put(Context.SECURITY_PRINCIPAL, username);
+            environments.put(Context.SECURITY_CREDENTIALS, password);
+        }
+
         return new InitialDirContext(environments);
     }
 
