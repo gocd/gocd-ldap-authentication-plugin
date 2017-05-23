@@ -55,16 +55,8 @@ public class AuthConfigValidateRequestExecutorTest {
                 "    \"key\": \"SearchBases\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"ManagerDN must not be blank.\",\n" +
-                "    \"key\": \"ManagerDN\"\n" +
-                "  },\n" +
-                "  {\n" +
                 "    \"message\": \"UserLoginFilter must not be blank.\",\n" +
                 "    \"key\": \"UserLoginFilter\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"message\": \"Password must not be blank.\",\n" +
-                "    \"key\": \"Password\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"key\": \"foo\",\n" +
@@ -91,15 +83,35 @@ public class AuthConfigValidateRequestExecutorTest {
                 "    \"key\": \"SearchBases\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"ManagerDN must not be blank.\",\n" +
-                "    \"key\": \"ManagerDN\"\n" +
+                "    \"message\": \"UserLoginFilter must not be blank.\",\n" +
+                "    \"key\": \"UserLoginFilter\"\n" +
+                "  }\n" +
+                "]";
+        JSONAssert.assertEquals(expectedJSON, json, JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void shouldValidatePresenceOfPasswordIfManagerDNIsProvided() throws Exception {
+        when(request.requestBody()).thenReturn(new Gson().toJson(Collections.singletonMap("ManagerDN", "cn=manager,ou=enterprise")));
+
+        GoPluginApiResponse response = new AuthConfigValidateRequestExecutor(request).execute();
+        String json = response.responseBody();
+
+        String expectedJSON = "[\n" +
+                "  {\n" +
+                "    \"message\": \"Url must not be blank.\",\n" +
+                "    \"key\": \"Url\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"message\": \"SearchBases must not be blank.\",\n" +
+                "    \"key\": \"SearchBases\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"message\": \"UserLoginFilter must not be blank.\",\n" +
                 "    \"key\": \"UserLoginFilter\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"message\": \"Password must not be blank.\",\n" +
+                "    \"message\": \"Password cannot be blank when ManagerDN is provided.\",\n" +
                 "    \"key\": \"Password\"\n" +
                 "  }\n" +
                 "]";

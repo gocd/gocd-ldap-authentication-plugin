@@ -61,14 +61,14 @@ public class GetAuthConfigMetadataExecutorTest {
                 "  {\n" +
                 "    \"key\": \"ManagerDN\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": false\n" +
                 "    }\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"key\": \"Password\",\n" +
                 "    \"metadata\": {\n" +
-                "      \"required\": true,\n" +
+                "      \"required\": false,\n" +
                 "      \"secure\": true\n" +
                 "    }\n" +
                 "  },\n" +

@@ -21,7 +21,7 @@
 </div>
 
 <div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[ManagerDN].$error.server}">Manager DN:<span class='asterix'>*</span></label>
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[ManagerDN].$error.server}">Manager DN:</label>
     <input ng-class="{'is-invalid-input': GOINPUTNAME[ManagerDN].$error.server}" type="text" ng-model="ManagerDN" ng-required="true"/>
     <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ManagerDN].$error.server}" ng-show="GOINPUTNAME[ManagerDN].$error.server">{{GOINPUTNAME[ManagerDN].$error.server}}</span>
 </div>

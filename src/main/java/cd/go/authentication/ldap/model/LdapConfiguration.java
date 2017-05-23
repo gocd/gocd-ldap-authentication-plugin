@@ -28,12 +28,11 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cd.go.authentication.ldap.utils.Util.GSON;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class LdapConfiguration {
     private static final String DEFAULT_USER_SEARCH_FILTER = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";
@@ -50,12 +49,12 @@ public class LdapConfiguration {
 
     @Expose
     @SerializedName("ManagerDN")
-    @ProfileField(key = "ManagerDN", required = true, secure = false)
+    @ProfileField(key = "ManagerDN", required = false, secure = false)
     private String managerDn;
 
     @Expose
     @SerializedName("Password")
-    @ProfileField(key = "Password", required = true, secure = true)
+    @ProfileField(key = "Password", required = false, secure = true)
     private String password;
 
     @Expose
@@ -150,7 +149,15 @@ public class LdapConfiguration {
     }
 
     public static List<Map<String, String>> validate(Map<String, String> properties) {
-        return MetadataHelper.validate(LdapConfiguration.class, properties);
+        List<Map<String, String>> errors = MetadataHelper.validate(LdapConfiguration.class, properties);
+
+        if (isNotBlank(properties.get("ManagerDN")) && isBlank(properties.get("Password"))) {
+            LinkedHashMap<String, String> validationError = new LinkedHashMap<>();
+            validationError.put("key", "Password");
+            validationError.put("message", "Password cannot be blank when ManagerDN is provided.");
+            errors.add(validationError);
+        }
+        return errors;
     }
 
     @Override
