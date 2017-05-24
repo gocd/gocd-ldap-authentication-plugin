@@ -16,7 +16,6 @@
 
 package cd.go.authentication.ldap.executor;
 
-import cd.go.authentication.ldap.LdapPlugin;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
@@ -29,90 +28,99 @@ import com.thoughtworks.go.plugin.api.response.validation.ValidationError;
 import com.thoughtworks.go.plugin.api.response.validation.ValidationResult;
 
 import javax.naming.NamingException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
+import static java.text.MessageFormat.format;
 
 public class VerifyConnectionRequestExecutor implements RequestExecutor {
-        private final Gson GSON = new Gson();
-        private final GoPluginApiRequest request;
-        private final LdapConfiguration ldapConfiguration;
-        private final LdapFactory ldapFactory;
+    private final Gson GSON = new Gson();
+    private final GoPluginApiRequest request;
+    private final LdapConfiguration ldapConfiguration;
+    private final LdapFactory ldapFactory;
 
-        public VerifyConnectionRequestExecutor(GoPluginApiRequest request) {
-            this(request, new LdapFactory());
+    public VerifyConnectionRequestExecutor(GoPluginApiRequest request) {
+        this(request, new LdapFactory());
+    }
+
+    protected VerifyConnectionRequestExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
+        this.ldapFactory = ldapFactory;
+        this.request = request;
+        this.ldapConfiguration = LdapConfiguration.fromJSON(request.requestBody());
+    }
+
+    @Override
+    public GoPluginApiResponse execute() {
+        List<Map<String, String>> errors = validateAuthConfig();
+        if (errors.size() != 0) {
+            return validationFailureResponse(errors);
         }
 
-        protected VerifyConnectionRequestExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
-            this.ldapFactory = ldapFactory;
-            this.request = request;
-            this.ldapConfiguration = LdapConfiguration.fromJSON(request.requestBody());
+        ValidationResult validationResult = verifyConnection();
+        if (!validationResult.isSuccessful()) {
+            return verifyConnectionFailureResponse(validationResult);
         }
 
-        @Override
-        public GoPluginApiResponse execute() {
-            List<Map<String, String>> errors = validateAuthConfig();
-            if (errors.size() != 0) {
-                return validationFailureResponse(errors);
+        return successResponse();
+    }
+
+    private ValidationResult verifyConnection() {
+        Ldap ldap = ldapFactory.ldapForConfiguration(ldapConfiguration);
+        ValidationResult result = new ValidationResult();
+
+        try {
+            ldap.validate();
+        } catch (NamingException e) {
+            result.addError(new ValidationError(getErrorMessage(e)));
+            LOG.error("[Verify Connection] Verify connection failed with errors.", e);
+        } catch (Exception e) {
+            result.addError(new ValidationError(e.getMessage()));
+            LOG.error("[Verify Connection] Verify connection failed with errors.", e);
+        }
+        return result;
+    }
+
+    private List<Map<String, String>> validateAuthConfig() {
+        Map<String, String> properties = GSON.fromJson(request.requestBody(), new TypeToken<Map<String, String>>() {
+        }.getType());
+        return LdapConfiguration.validate(properties);
+    }
+
+    private GoPluginApiResponse successResponse() {
+        return responseWith("success", "Connection ok", null);
+    }
+
+    private GoPluginApiResponse verifyConnectionFailureResponse(ValidationResult validationResult) {
+        return responseWith("failure", validationResult.getErrors().get(0).getMessage(), null);
+    }
+
+    private GoPluginApiResponse validationFailureResponse(List<Map<String, String>> errors) {
+        return responseWith("validation-failed", "Validation failed for the given Auth Config", errors);
+    }
+
+    private GoPluginApiResponse responseWith(String status, String message, List<Map<String, String>> errors) {
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("status", status);
+        response.put("message", message);
+
+        if (errors != null && errors.size() > 0) {
+            response.put("errors", errors);
+        }
+
+        return DefaultGoPluginApiResponse.success(GSON.toJson(response));
+    }
+
+    private String getErrorMessage(NamingException e) {
+        if (e.getRootCause() != null) {
+            final Throwable rootCause = e.getRootCause();
+            if (rootCause instanceof UnknownHostException) {
+                return format("Unknown host `{0}`.", rootCause.getMessage());
             }
-
-            ValidationResult validationResult = verifyConnection();
-            if (!validationResult.isSuccessful()) {
-                return verifyConnectionFailureResponse(validationResult);
-            }
-
-            return successResponse();
+            return rootCause.getMessage();
         }
-
-        private ValidationResult verifyConnection() {
-            Ldap ldap = ldapFactory.ldapForConfiguration(ldapConfiguration);
-            ValidationResult result = new ValidationResult();
-
-            try {
-                ldap.validate();
-            } catch (NamingException e) {
-                result.addError(new ValidationError(getErrorMessage(e)));
-                LOG.error("[Verify Connection] Verify connection failed with errors.", e);
-            } catch (Exception e) {
-                result.addError(new ValidationError(e.getMessage()));
-                LOG.error("[Verify Connection] Verify connection failed with errors.", e);
-            }
-            return result;
-        }
-
-        private List<Map<String, String>> validateAuthConfig() {
-            Map<String, String> properties = GSON.fromJson(request.requestBody(), new TypeToken<Map<String, String>>() {
-            }.getType());
-            return LdapConfiguration.validate(properties);
-        }
-
-        private GoPluginApiResponse successResponse() {
-            return responseWith("success", "Connection ok", null);
-        }
-
-        private GoPluginApiResponse verifyConnectionFailureResponse(ValidationResult validationResult) {
-            return responseWith("failure", validationResult.getErrors().get(0).getMessage(), null);
-        }
-
-        private GoPluginApiResponse validationFailureResponse(List<Map<String, String>> errors) {
-            return responseWith("validation-failed", "Validation failed for the given Auth Config", errors);
-        }
-
-        private GoPluginApiResponse responseWith(String status, String message, List<Map<String, String>> errors) {
-            HashMap<String, Object> response = new HashMap<>();
-            response.put("status", status);
-            response.put("message", message);
-
-            if (errors != null && errors.size() > 0) {
-                response.put("errors", errors);
-            }
-
-            return DefaultGoPluginApiResponse.success(GSON.toJson(response));
-        }
-
-        private String getErrorMessage(NamingException e) {
-            return e.getMessage().replaceAll("\\[|\\]", "");
-        }
+        return e.getMessage().replaceAll("\\[|\\]", "");
+    }
 }

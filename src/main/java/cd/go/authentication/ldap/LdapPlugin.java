@@ -17,11 +17,14 @@
 package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.executor.*;
+import cd.go.authentication.ldap.utils.Util;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.annotation.Extension;
+import com.thoughtworks.go.plugin.api.annotation.Load;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
+import com.thoughtworks.go.plugin.api.info.PluginContext;
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -39,6 +42,11 @@ public class LdapPlugin implements GoPlugin {
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor accessor) {
         this.accessor = accessor;
+    }
+
+    @Load
+    public void onLoad(PluginContext ctx) {
+        LOG.info("Loading plugin " + Util.pluginId() + " version " + Util.pluginVersion());
     }
 
     @Override

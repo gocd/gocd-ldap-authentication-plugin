@@ -61,6 +61,17 @@ public class Util {
         }
     }
 
+    public static String pluginVersion() {
+        String s = readResource("/plugin.properties");
+        try {
+            Properties properties = new Properties();
+            properties.load(new StringReader(s));
+            return (String) properties.get("version");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static List<String> listFromCommaSeparatedString(String str) {
         if (StringUtils.isBlank(str)) {
             return Collections.emptyList();

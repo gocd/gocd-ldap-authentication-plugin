@@ -21,14 +21,12 @@ import cd.go.authentication.ldap.annotation.ProfileField;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.utils.Util;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
-import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static cd.go.authentication.ldap.utils.Util.GSON;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -91,13 +89,6 @@ public class LdapConfiguration {
 
     public static LdapConfiguration fromJSON(String json) {
         return GSON.fromJson(json, LdapConfiguration.class);
-    }
-
-    public static Map<String, LdapConfiguration> fromJSONMap(String json) {
-        JsonObject jsonObject = GSON.fromJson(json, JsonObject.class);
-        Type type = new TypeToken<Map<String, LdapConfiguration>>() {
-        }.getType();
-        return GSON.fromJson(jsonObject.get("profiles").toString(), type);
     }
 
     public String getLdapUrl() {
