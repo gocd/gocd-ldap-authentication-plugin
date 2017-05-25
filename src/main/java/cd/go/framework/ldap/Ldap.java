@@ -17,8 +17,6 @@
 package cd.go.framework.ldap;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import cd.go.framework.ldap.filter.EqualsFilter;
-import cd.go.framework.ldap.filter.Filter;
 import cd.go.framework.ldap.mapper.AbstractMapper;
 
 import javax.naming.Context;
@@ -29,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class Ldap {
@@ -86,7 +85,7 @@ public class Ldap {
     }
 
     public <T> List<T> search(String filter, Object[] filterArgs, AbstractMapper<T> mapper, int maxResult) throws NamingException {
-        List<T> results = new ArrayList<T>();
+        List<T> results = new ArrayList<>();
         NamingEnumeration<SearchResult> searchResults = search(filter, filterArgs, maxResult);
         if (searchResults == null)
             return results;
@@ -101,9 +100,13 @@ public class Ldap {
     private NamingEnumeration<SearchResult> search(String filter, Object[] filterArgs, int maxResult) throws NamingException {
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
         for (String base : ldapConfiguration.getSearchBases()) {
-            NamingEnumeration<SearchResult> results = dirContext.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
-            if (results.hasMore())
-                return results;
+            try {
+                NamingEnumeration<SearchResult> results = dirContext.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
+                if (results.hasMore())
+                    return results;
+            } catch (Exception e) {
+                LOG.error(e.getMessage(), e);
+            }
         }
         return null;
     }
