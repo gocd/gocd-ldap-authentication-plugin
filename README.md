@@ -1,24 +1,25 @@
-# GoCD LDAP Authentication Plugin
-GoCD plugin for LDAP authentication
+# GoCD LDAP/AD Authentication Plugin
+LDAP plugin which implements the GoCD [Authorization Plugin](https://plugin-api.gocd.io/current/authorization/) endpoint.
 
 ## Building the code base
 To build the jar, run `./gradlew clean test assemble`
 
 ## Requirements
-These plugins require GoCD version v17.2 or above.
+These plugins require GoCD version v17.5 or above.
 
 ## Installation
-- Download the latest plugin jar from the [Releases](https://github.com/gocd/gocd-ldap-authentication-plugin/releases) section. Place it in `<go-server-location>/plugins/external` & restart Go Server. You can find the location of the Go Server installation [here](http://www.go.cd/documentation/user/current/installation/installing_go_server.html#location-of-files-after-installation-of-go-server).
-- Developer
-    * [Building the code base](https://github.com/gocd/gocd-ldap-authentication-plugin/blob/master/README.md#building-the-code-base)
-    * Build path: `<project-location>/build/libs/<your-jar-is-here>`
+- From GoCD ```17.5.0``` onwards the plugin comes bundled along with server, hence a separate installation is not required.
 
 ## Configuration
-This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server` which you have to configure in `config.xml` under `<security>` configuration.
+The plugin requires necessary configurations to connect to LDAP/AD. The configuration can be added by adding a Authorization Configuration
+by visting the Authorization Configuration page under Admin/Security.
+
+Alternatively, the configuration can be added directly to the `config.xml` using the `<authConfig>` configuration.
   
-* Example profile
+* Example Configuration
  
 ```xml
+  <security>
     <authConfigs>
       <authConfig id="profile-id" pluginId="cd.go.authentication.ldap">
         <property>
@@ -27,23 +28,23 @@ This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server
         </property>
         <property>
           <key>ManagerDN</key>
-          <value>your-manager-dn</value>
+          <value>cn=go,ou=Teams,dc=corporate,dc=example,dc=com</value>
         </property>
         <property>
           <key>Password</key>
-          <value>manager-password</value>
+          <value>secret</value>
         </property>
         <property>
           <key>SearchBases</key>
-          <value>your-user-search-base</value>
+          <value>ou=Teams,dc=corporate,dc=example,dc=com</value>
         </property>
         <property>
-          <key>LoginAttribute</key>
-          <value>login-attribute</value>
+          <key>UserLoginFilter</key>
+          <value>(sAMAccountName={0})</value>
         </property>
         <property>
-          <key>SearchAttributes</key>
-          <value>search-attributes</value>
+          <key>UserSearchFilter</key>
+          <value>(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))</value>
         </property>
         <property>
           <key>DisplayNameAttribute</key>
@@ -55,9 +56,10 @@ This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server
         </property>
       </authConfig>
     </authConfigs>
+  </security>
 ```  
 * **Url:** Specify your ldap server URL
-* **ManagerDN:** Specify full mangerDN
+* **ManagerDN:**  The LDAP/AD manager user's DN, used to connect to the LDAP/AD server.
  
     ```xml
     <property>
@@ -65,8 +67,10 @@ This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server
        <value>uid=admin,ou=system,dc=example,dc=com</value>
     </property>
     ```
-* **Password:** Specify manager password
-* **SearchBases:** Provide user search base of your ldap server. You can provide multiple search bases
+* **Password:** The LDAP/AD manager password, used to connect to the LDAP/AD server. Required only if a ManagerDN is specified.
+* **SearchBases:** Is a mandatory field which defines the location in the directory from which the LDAP search begins.
+You can provide multiple search bases. If multiple search bases are configured the plugin would look for the user in each search base sequentially
+till the user is found.
 
     > Single search base: 
     ```xml
@@ -86,28 +90,44 @@ This plugin uses `<authConfig>` profile(s) in order to connect with `ldap server
         </value>
     </property>
     ```
-* **LoginAttribute:** This is a mandatory field which is required to uniquely identity a user in the ldap server.  
+* **UserLoginFilter:** It is an LDAP search filter used during authentication to lookup for a user entry matching the given expression.
+In the below example the filter would search for a username matching the ```sAMAccountName``` attribute.
     
     ```xml
     <property>
-       <key>LoginAttribute</key>
-       <value>sAMAccountName</value>
+       <key>UserLoginFilter</key>
+       <value>(sAMAccountName={0})</value>
     </property>
     ```
     
-* **SearchAttributes:** SearchAttributes can be used to configure user search to look for certain attributes.    
+* **UserSearchFilter:** It is an LDAP search filter used to lookup for users matching a given search term.
+This is an optional configuration, the default filter used is ```(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))```.
     ```xml
     <property>
-       <key>SearchAttributes</key>
-       <value>mail, name, sn, l</value>
+       <key>UserSearchFilter</key>
+       <value>(|(sAMAccountName=*{0}*)(uid=*{0}*))</value>
     </property>
     ```
   
-* **DisplayNameAttribute:** Value of this attribute is displayed on GoCD user profile
-* **EmailAttribute:** This allows user to map custom `email` field of their LDAP server.
- 
+* **DisplayNameAttribute:** Value of this attribute is mapped to GoCD User displayname, default attribute used is ```cn```.
 
-*Note: You can also configure multiple LDAP serve by adding* 
+    ```xml
+    <property>
+       <key>DisplayNameAttribute</key>
+       <value>displayName</value>
+    </property>
+    ```
+
+* **EmailAttribute:** Value of this attribute is mapped to GoCD User mail, default value used is ```mail```.
+ 
+   ```xml
+    <property>
+        <key>EmailAttribute</key>
+        <value>mail</value>
+    </property>
+    ```
+
+*Note: The plugin allows having multiple configurations to connect to different LDAP/AD servers*
 ```xml
 <authConfig id="second-profile-id" pluginId="cd.go.authentication.ldap">
 ...
