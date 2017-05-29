@@ -16,8 +16,7 @@ These plugins require GoCD version v17.5 or above.
 
 ## Configuration
 
-The plugin requires necessary configurations to connect to LDAP/AD. The configuration can be added by adding a Authorization Configuration
-by visting the Authorization Configuration page under Admin/Security.
+The plugin requires necessary configurations to connect to LDAP/AD. The configuration can be added by adding a Authorization Configuration by visting the Authorization Configuration page under *Admin > Security*.
 
 Alternatively, the configuration can be added directly to the `config.xml` using the `<authConfig>` configuration.
   
@@ -63,6 +62,7 @@ Alternatively, the configuration can be added directly to the `config.xml` using
       </authConfigs>
     </security>
     ```
+
 * **Url (Mandatory) :** Specify your ldap server URL. The plugin does not [support](https://github.com/gocd/gocd-ldap-authentication-plugin/issues/24) configuring certificates for connecting to LDAP server over SSL, a workaround for this issue involves importing the certificates directly into java's cacerts.
 
 
@@ -73,7 +73,7 @@ Alternatively, the configuration can be added directly to the `config.xml` using
     </property>
     ```
 
-* **ManagerDN (Optional)  :**  The LDAP/AD manager user's DN, used to connect to the LDAP/AD server.
+* **ManagerDN (Optional):**  The LDAP/AD manager user's DN, used to connect to the LDAP/AD server.
  
     ```xml
     <property>
@@ -81,10 +81,11 @@ Alternatively, the configuration can be added directly to the `config.xml` using
        <value>uid=admin,ou=system,dc=example,dc=com</value>
     </property>
     ```
-* **Password (Mandatory if ManagerDN provided) :** The LDAP/AD manager password, used to connect to the LDAP/AD server. Required only if a ManagerDN is specified.
-* **SearchBases (Mandatory) :** This field defines the location in the directory from which the LDAP search begins.
-You can provide multiple search bases. If multiple search bases are configured the plugin would look for the user in each search base sequentially
-until the user is found.
+
+* **Password (Mandatory if `ManagerDN` provided):** The LDAP/AD manager password, used to connect to the LDAP/AD server. Required only if a ManagerDN is specified.
+
+* **SearchBases (Mandatory):** This field defines the location in the directory from which the LDAP search begins.
+You can provide multiple search bases. If multiple search bases are configured the plugin would look for the user in each search base sequentially until the user is found.
 
     > Single search base: 
     ```xml
@@ -104,8 +105,9 @@ until the user is found.
         </value>
     </property>
     ```
-* **UserLoginFilter (Mandatory) :** It is an LDAP search filter used during authentication to lookup for a user entry matching the given expression.
-In the below example the filter would search for a username matching the ```sAMAccountName``` attribute.
+* **UserLoginFilter (Mandatory):** It is an LDAP search filter used during authentication to lookup for a user entry matching the given expression.
+
+    In the following example the filter would search for a username matching the ```sAMAccountName``` attribute.
     
     ```xml
     <property>
@@ -114,8 +116,9 @@ In the below example the filter would search for a username matching the ```sAMA
     </property>
     ```
     
-* **UserSearchFilter (Optional) :** It is an LDAP search filter used to lookup for users matching a given search term.
+* **UserSearchFilter (Optional):** It is an LDAP search filter used to lookup for users matching a given search term.
 This is an optional configuration, the default filter used is ```(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))```.
+
     ```xml
     <property>
        <key>UserSearchFilter</key>
@@ -123,7 +126,7 @@ This is an optional configuration, the default filter used is ```(|(sAMAccountNa
     </property>
     ```
   
-* **DisplayNameAttribute (Optional) :** Value of this attribute is mapped to GoCD User displayname, default attribute used is ```cn```.
+* **DisplayNameAttribute (Optional):** Value of this attribute is mapped to GoCD User displayname, default attribute used is ```cn```.
 
     ```xml
     <property>
@@ -132,7 +135,7 @@ This is an optional configuration, the default filter used is ```(|(sAMAccountNa
     </property>
     ```
 
-* **EmailAttribute (Optional) :** Value of this attribute is mapped to GoCD User mail, default value used is ```mail```.
+* **EmailAttribute (Optional):** Value of this attribute is mapped to GoCD User mail, default value used is ```mail```.
  
    ```xml
     <property>
@@ -142,6 +145,7 @@ This is an optional configuration, the default filter used is ```(|(sAMAccountNa
     ```
 
 *Note: The plugin allows having multiple configurations to connect to different LDAP/AD servers*
+
 ```xml
 <authConfig id="second-profile-id" pluginId="cd.go.authentication.ldap">
 ...
