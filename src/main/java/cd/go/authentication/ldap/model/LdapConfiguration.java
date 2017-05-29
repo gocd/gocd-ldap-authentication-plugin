@@ -77,15 +77,7 @@ public class LdapConfiguration {
 
     @Expose
     @SerializedName("LdapConnectionPoolSize")
-    private int ldapConnectionPoolSize = 20;
-
-    @Expose
-    @SerializedName("LdapConnectionPoolPrefSize")
-    private int ldapConnectionPoolPrefSize = 10;
-
-    @Expose
-    @SerializedName("LdapConnectionPoolTimeout")
-    private long ldapConnectionPoolTimeout = 300000;
+    private String useConnectionPool = "true";
 
     public static LdapConfiguration fromJSON(String json) {
         return GSON.fromJson(json, LdapConfiguration.class);
@@ -127,16 +119,8 @@ public class LdapConfiguration {
         return new UserMapper(resolver, getDisplayNameAttribute(), getEmailAttribute());
     }
 
-    public int getLdapConnectionPoolSize() {
-        return ldapConnectionPoolSize;
-    }
-
-    public int getLdapConnectionPoolPrefSize() {
-        return ldapConnectionPoolPrefSize;
-    }
-
-    public long getLdapConnectionPoolTimeout() {
-        return ldapConnectionPoolTimeout;
+    public String useConnectionPool() {
+        return useConnectionPool;
     }
 
     public static List<Map<String, String>> validate(Map<String, String> properties) {
@@ -158,9 +142,6 @@ public class LdapConfiguration {
 
         LdapConfiguration that = (LdapConfiguration) o;
 
-        if (ldapConnectionPoolSize != that.ldapConnectionPoolSize) return false;
-        if (ldapConnectionPoolPrefSize != that.ldapConnectionPoolPrefSize) return false;
-        if (ldapConnectionPoolTimeout != that.ldapConnectionPoolTimeout) return false;
         if (ldapUrl != null ? !ldapUrl.equals(that.ldapUrl) : that.ldapUrl != null) return false;
         if (searchBases != null ? !searchBases.equals(that.searchBases) : that.searchBases != null) return false;
         if (managerDn != null ? !managerDn.equals(that.managerDn) : that.managerDn != null) return false;
@@ -171,7 +152,9 @@ public class LdapConfiguration {
             return false;
         if (displayNameAttribute != null ? !displayNameAttribute.equals(that.displayNameAttribute) : that.displayNameAttribute != null)
             return false;
-        return emailAttribute != null ? emailAttribute.equals(that.emailAttribute) : that.emailAttribute == null;
+        if (emailAttribute != null ? !emailAttribute.equals(that.emailAttribute) : that.emailAttribute != null)
+            return false;
+        return useConnectionPool != null ? useConnectionPool.equals(that.useConnectionPool) : that.useConnectionPool == null;
     }
 
     @Override
@@ -184,9 +167,7 @@ public class LdapConfiguration {
         result = 31 * result + (userLoginFilter != null ? userLoginFilter.hashCode() : 0);
         result = 31 * result + (displayNameAttribute != null ? displayNameAttribute.hashCode() : 0);
         result = 31 * result + (emailAttribute != null ? emailAttribute.hashCode() : 0);
-        result = 31 * result + ldapConnectionPoolSize;
-        result = 31 * result + ldapConnectionPoolPrefSize;
-        result = 31 * result + (int) (ldapConnectionPoolTimeout ^ (ldapConnectionPoolTimeout >>> 32));
+        result = 31 * result + (useConnectionPool != null ? useConnectionPool.hashCode() : 0);
         return result;
     }
 }
