@@ -19,7 +19,6 @@ package cd.go.framework.ldap;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.mapper.AbstractMapper;
 
-import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
@@ -28,6 +27,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
+import static javax.naming.Context.SECURITY_CREDENTIALS;
+import static javax.naming.Context.SECURITY_PRINCIPAL;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class Ldap {
@@ -38,18 +39,87 @@ public class Ldap {
         this.ldapConfiguration = ldapConfiguration;
     }
 
-    private DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
-        Hashtable environments = new Environment(ldapConfiguration, true).getEnvironments();
-        if (isNotBlank(username)) {
-            environments.put(Context.SECURITY_PRINCIPAL, username);
-            environments.put(Context.SECURITY_CREDENTIALS, password);
+    public <T> T authenticate(String username, String password, AbstractMapper<T> mapper) throws NamingException {
+        DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
+
+        try {
+            List<SearchResult> results = search(dirContext, ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT);
+
+            if (results.isEmpty())
+                throw new RuntimeException("User " + username + " does not exist in " + ldapConfiguration.getLdapUrl());
+
+            SearchResult searchResult = results.get(0);
+            Attributes attributes = searchResult.getAttributes();
+            String userDn = searchResult.getNameInNamespace();
+            attributes.put(new BasicAttribute("dn", userDn));
+            authenticate(ldapConfiguration, userDn, password);
+            return mapper.mapFromResult(attributes);
+
+        } finally {
+            closeContextSilently(dirContext);
+        }
+    }
+
+    public <T> List<T> search(String filter, Object[] filterArgs, AbstractMapper<T> mapper, int maxResult) throws NamingException {
+        List<T> results = new ArrayList<>();
+        DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
+
+        try {
+            List<SearchResult> searchResults = search(dirContext, filter, filterArgs, maxResult);
+
+            for (SearchResult result : searchResults) {
+                results.add(mapper.mapFromResult(result.getAttributes()));
+            }
+        } finally {
+            closeContextSilently(dirContext);
         }
 
-        return new InitialDirContext(environments);
+        return results;
+    }
+
+    private DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
+        Hashtable<String, Object> environments = new Environment(ldapConfiguration).getEnvironments();
+        if (isNotBlank(username)) {
+            environments.put(SECURITY_PRINCIPAL, username);
+            environments.put(SECURITY_CREDENTIALS, password);
+        }
+
+        InitialDirContext context = null;
+
+        try {
+            context = new InitialDirContext(environments);
+        } catch (NamingException e) {
+            closeContextSilently(context);
+            throw e;
+        }
+
+        return context;
+    }
+
+    private List<SearchResult> search(DirContext context, String filter, Object[] filterArgs, int maxResult) throws NamingException {
+        List<SearchResult> results = new ArrayList<>();
+        for (String base : ldapConfiguration.getSearchBases()) {
+            NamingEnumeration<SearchResult> searchResults = null;
+            try {
+                searchResults = context.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
+                while (searchResults.hasMore() && results.size() < maxResult) {
+                    results.add(searchResults.next());
+                }
+                if (results.size() >= maxResult) {
+                    break;
+                }
+            } catch (Exception e) {
+                LOG.error(e.getMessage(), e);
+            } finally {
+                closeNamingEnumerationSilently(searchResults);
+            }
+        }
+
+        return results;
     }
 
     private void authenticate(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
-        getDirContext(ldapConfiguration, username, password).close();
+        closeContextSilently(getDirContext(ldapConfiguration, username, password));
     }
 
     public void validate() throws NamingException {
@@ -65,49 +135,27 @@ public class Ldap {
         return searchControls;
     }
 
-    public <T> T authenticate(String username, String password, AbstractMapper<T> mapper) throws NamingException {
-        NamingEnumeration<SearchResult> results = search(ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT);
-
-        if (results == null || !results.hasMore())
-            throw new RuntimeException("User " + username + " is not exist in " + ldapConfiguration.getLdapUrl());
-
-        while (results.hasMore()) {
-            SearchResult searchResult = results.next();
-            Attributes attributes = searchResult.getAttributes();
-            String userDn = searchResult.getNameInNamespace();
-            attributes.put(new BasicAttribute("dn", userDn));
-            authenticate(ldapConfiguration, userDn, password);
-            return mapper.mapFromResult(attributes);
+    private void closeContextSilently(DirContext dirContext) {
+        if (dirContext == null) {
+            return;
         }
 
-        results.close();
-        return null;
+        try {
+            dirContext.close();
+        } catch (Exception e) {
+            LOG.error("Error closing ldap connection", e);
+        }
     }
 
-    public <T> List<T> search(String filter, Object[] filterArgs, AbstractMapper<T> mapper, int maxResult) throws NamingException {
-        List<T> results = new ArrayList<>();
-        NamingEnumeration<SearchResult> searchResults = search(filter, filterArgs, maxResult);
-        if (searchResults == null)
-            return results;
-
-        while (searchResults.hasMore()) {
-            results.add(mapper.mapFromResult(searchResults.next().getAttributes()));
+    private void closeNamingEnumerationSilently(NamingEnumeration namingEnumeration) {
+        if (namingEnumeration == null) {
+            return;
         }
-        searchResults.close();
-        return results;
-    }
 
-    private NamingEnumeration<SearchResult> search(String filter, Object[] filterArgs, int maxResult) throws NamingException {
-        DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
-        for (String base : ldapConfiguration.getSearchBases()) {
-            try {
-                NamingEnumeration<SearchResult> results = dirContext.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
-                if (results.hasMore())
-                    return results;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-            }
+        try {
+            namingEnumeration.close();
+        } catch (Exception e) {
+            LOG.error("Error closing naming enumeration", e);
         }
-        return null;
     }
 }
