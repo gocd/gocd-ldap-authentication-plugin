@@ -152,8 +152,41 @@ This is an optional configuration, the default filter used is ```(|(sAMAccountNa
 </authConfig>
 ```
 
+## Troubleshooting
+
+### Verify Connection
+
+For a given Authorization Configuration verify if the plugin can connect to the LDAP/AD server. The Authorization Configuration page under *Admin > Security* gives an option to verify connection.
+
+### Enable Debug Logs
+
+* On Linux:
+
+    Enabling debug level logging can help you troubleshoot an issue with this plugin. To enable debug level logs, edit the file `/etc/default/go-server` (for Linux) to add:
+
+    ```shell
+    export GO_SERVER_SYSTEM_PROPERTIES="$GO_SERVER_SYSTEM_PROPERTIES -Dplugin.cd.go.authentication.ldap.log.level=debug"
+    ```
+
+    If you're running the server via `./server.sh` script:
+
+    ```shell
+    $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.authentication.ldap.log.level=debug" ./server.sh
+    ```
+
+* On windows:
+
+    Edit the file `config/wrapper-properties.conf` inside the GoCD Server installation directory (typically `C:\Program Files\Go Server`):
+
+    ```
+    # config/wrapper-properties.conf
+    # since the last "wrapper.java.additional" index is 15, we use the next available index.
+    wrapper.java.additional.16=-Dplugin.cd.go.authentication.ldap.log.level=debug
+    ```
+
 ## License
 
+# Trouble
 ```plain
 Copyright 2017 ThoughtWorks, Inc.
 
