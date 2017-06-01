@@ -186,7 +186,6 @@ For a given Authorization Configuration verify if the plugin can connect to the 
 
 ## License
 
-# Trouble
 ```plain
 Copyright 2017 ThoughtWorks, Inc.
 

@@ -16,6 +16,7 @@ This plugin is bundled along with the GoCD server, hence there will be no separa
 2. Verify Connection validates the auth config before checking connection.
 
 ### Fixed
+
 1. When multiple search bases are defined, a invalid search base should not error out the operations. Errors are logged and the operation continues with the next search base.
 
 
