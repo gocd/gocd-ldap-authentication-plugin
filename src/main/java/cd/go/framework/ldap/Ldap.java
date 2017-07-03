@@ -102,8 +102,8 @@ public class Ldap {
             NamingEnumeration<SearchResult> searchResults = null;
             try {
                 searchResults = context.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
-                while (searchResults.hasMore() && results.size() < maxResult) {
-                    results.add(searchResults.next());
+                while (searchResults.hasMoreElements() && results.size() < maxResult) {
+                    results.add(searchResults.nextElement());
                 }
                 if (results.size() >= maxResult) {
                     break;
