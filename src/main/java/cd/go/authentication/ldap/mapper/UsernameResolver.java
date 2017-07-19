@@ -23,7 +23,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static cd.go.authentication.ldap.utils.Util.isNotBlank;
 
 
 public class UsernameResolver {

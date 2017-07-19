@@ -16,7 +16,7 @@
 
 package cd.go.authentication.ldap.model;
 
-import org.apache.commons.lang3.StringUtils;
+import static cd.go.authentication.ldap.utils.Util.isBlank;
 
 public class NonBlankField extends Field {
     public NonBlankField(String key, String displayName, String defaultValue, Boolean secure, String displayOrder) {
@@ -25,7 +25,7 @@ public class NonBlankField extends Field {
 
     @Override
     public String doValidate(String input) {
-        if (StringUtils.isBlank(input)) {
+        if (isBlank(input)) {
             return this.displayName + " must not be blank.";
         }
         return null;

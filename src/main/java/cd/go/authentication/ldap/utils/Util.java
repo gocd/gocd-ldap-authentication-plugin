@@ -18,14 +18,14 @@ package cd.go.authentication.ldap.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,17 +35,14 @@ public class Util {
     public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static String readResource(String resourceFile) {
-        try (InputStreamReader reader = new InputStreamReader(Util.class.getResourceAsStream(resourceFile), StandardCharsets.UTF_8)) {
-            return IOUtils.toString(reader);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not find resource " + resourceFile, e);
-        }
+        return new String(readResourceBytes(resourceFile), StandardCharsets.UTF_8);
     }
 
     public static byte[] readResourceBytes(String resourceFile) {
-        try (InputStream in = Util.class.getResourceAsStream(resourceFile)) {
-            return IOUtils.toByteArray(in);
-        } catch (IOException e) {
+        try {
+            Path path = Paths.get(Util.class.getResource(resourceFile).toURI());
+            return Files.readAllBytes(path);
+        } catch (URISyntaxException | IOException e) {
             throw new RuntimeException("Could not find resource " + resourceFile, e);
         }
     }
@@ -73,17 +70,35 @@ public class Util {
     }
 
     public static List<String> listFromCommaSeparatedString(String str) {
-        if (StringUtils.isBlank(str)) {
+        if (isBlank(str)) {
             return Collections.emptyList();
         }
         return Arrays.asList(str.split("\\s*,\\s*"));
     }
 
     public static List<String> splitIntoLinesAndTrimSpaces(String lines) {
-        if (StringUtils.isBlank(lines)) {
+        if (isBlank(lines)) {
             return Collections.emptyList();
         }
 
         return Arrays.asList(lines.split("\\s*[\r\n]+\\s*"));
     }
+
+    public static boolean isNotBlank(final CharSequence cs) {
+        return !isBlank(cs);
+    }
+
+    public static boolean isBlank(final CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(cs.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

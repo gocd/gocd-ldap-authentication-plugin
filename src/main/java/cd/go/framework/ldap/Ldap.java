@@ -27,9 +27,9 @@ import java.util.Hashtable;
 import java.util.List;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
+import static cd.go.authentication.ldap.utils.Util.isNotBlank;
 import static javax.naming.Context.SECURITY_CREDENTIALS;
 import static javax.naming.Context.SECURITY_PRINCIPAL;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class Ldap {
     private LdapConfiguration ldapConfiguration;

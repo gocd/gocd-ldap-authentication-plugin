@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import static cd.go.authentication.ldap.utils.Util.GSON;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static cd.go.authentication.ldap.utils.Util.isBlank;
+import static cd.go.authentication.ldap.utils.Util.isNotBlank;
 
 public class LdapConfiguration {
     private static final String DEFAULT_USER_SEARCH_FILTER = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";

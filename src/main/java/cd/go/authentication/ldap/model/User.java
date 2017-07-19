@@ -16,10 +16,8 @@
 
 package cd.go.authentication.ldap.model;
 
-import cd.go.authentication.ldap.exception.InvalidUsernameException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.naming.directory.Attributes;
 
