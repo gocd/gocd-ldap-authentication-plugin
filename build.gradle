@@ -21,17 +21,34 @@ def gitRevision = { ->
   exec {
     commandLine "git", "log", "-n", "1", "--format=%H"
     standardOutput = hashStdOut
-    workingDir = project.projectDir
   }
 
   return hashStdOut.toString().trim()
 }
 
+def releaseRevision = { ->
+  def hashStdOut = new ByteArrayOutputStream()
+  exec {
+    commandLine "git", "log", "--pretty=format:"
+    standardOutput = hashStdOut
+  }
+
+  return hashStdOut.size().toString()
+}
+
+def PLUGIN_VERSION = '1.0.0'
+def DIST_VERSION = releaseRevision()
+def GIT_REVISION = gitRevision()
+
 group = 'cd.go'
+rootProject.ext.distVersion = DIST_VERSION
+rootProject.ext.fullVersion = DIST_VERSION ? "${PLUGIN_VERSION}-${DIST_VERSION}" : PLUGIN_VERSION
+rootProject.ext.gitRevision = GIT_REVISION
+version = project.fullVersion
 
 project.ext.pluginDesc = [
   id         : 'cd.go.authentication.ldap',
-  version    : gitRevision(),
+  version    : project.fullVersion,
   goCdVersion: '17.5.0',
   name       : 'LDAP Authentication Plugin for GoCD',
   description: 'LDAP Authentication Plugin for GoCD',
@@ -79,6 +96,7 @@ jar {
       'Go-Version': project.pluginDesc.goCdVersion,
       'Plugin-Revision': project.pluginDesc.version,
       'Implementation-Title': project.name,
+      'Implementation-Version': project.version,
       'Source-Compatibility': project.sourceCompatibility,
       'Target-Compatibility': project.targetCompatibility
     )
