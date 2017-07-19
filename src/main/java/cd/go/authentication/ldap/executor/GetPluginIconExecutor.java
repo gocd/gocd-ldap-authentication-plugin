@@ -32,7 +32,6 @@ public class GetPluginIconExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("content_type", "image/png");
-        System.out.println("Base64.getEncoder().encodeToString(Util.readResourceBytes(\"/gocd_72_72_icon.png\")) = " + Base64.getEncoder().encodeToString(Util.readResourceBytes("/gocd_72_72_icon.png")));
         jsonObject.addProperty("data", Base64.getEncoder().encodeToString(Util.readResourceBytes("/gocd_72_72_icon.png")));
         DefaultGoPluginApiResponse defaultGoPluginApiResponse = new DefaultGoPluginApiResponse(200, GSON.toJson(jsonObject));
         return defaultGoPluginApiResponse;
