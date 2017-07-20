@@ -1,6 +1,10 @@
 # Changelog
 
-This plugin is bundled along with the GoCD server, hence there will be no separate release of the plugin. Any notable changes would be listed here against the git commit.
+## 1.0.0
+
+### Improved
+
+Reduced the size of the plugin from 1.1MB to 270KB by removing dependencies on utility code from apache commons. There are no functional changes from the previous release.
 
 ## [3601af8](https://github.com/gocd/gocd-ldap-authentication-plugin/commit/3601af806a2781ca679cc0f5dae485a37319818a) - Bundled with *GoCD v17.5.0*
 
