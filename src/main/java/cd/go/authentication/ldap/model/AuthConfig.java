@@ -35,6 +35,14 @@ public class AuthConfig {
     @SerializedName("configuration")
     private LdapConfiguration configuration;
 
+    public AuthConfig() {
+    }
+
+    public AuthConfig(String id, LdapConfiguration ldapConfiguration) {
+        this.id = id;
+        configuration = ldapConfiguration;
+    }
+
     public String getId() {
         return id;
     }
