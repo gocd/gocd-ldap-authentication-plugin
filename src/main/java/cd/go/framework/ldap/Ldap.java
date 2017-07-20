@@ -135,7 +135,7 @@ public class Ldap {
         return searchControls;
     }
 
-    private void closeContextSilently(DirContext dirContext) {
+    void closeContextSilently(DirContext dirContext) {
         if (dirContext == null) {
             return;
         }
@@ -147,7 +147,7 @@ public class Ldap {
         }
     }
 
-    private void closeNamingEnumerationSilently(NamingEnumeration namingEnumeration) {
+    void closeNamingEnumerationSilently(NamingEnumeration namingEnumeration) {
         if (namingEnumeration == null) {
             return;
         }

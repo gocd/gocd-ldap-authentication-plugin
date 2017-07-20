@@ -1,0 +1,119 @@
+version: 1
+
+dn: ou=Principal,ou=system
+objectClass: organizationalUnit
+objectClass: top
+ou: Principal
+
+dn: ou=Enterprise,ou=Principal,ou=system
+objectClass: organizationalUnit
+objectClass: top
+ou: Enterprise
+
+dn: ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: organizationalUnit
+objectClass: top
+ou: Employees
+
+dn: uid=bob,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: bford
+cn: Bob Ford
+sn: Ford
+userPassword: bob
+displayName: Bob Ford
+mail: bford@example.com
+l: New York
+
+dn: uid=pbanks,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: pbanks
+cn: Phillip Banks
+sn: Banks
+userPassword: phillip
+displayName: P.Banks
+mail: pbanks@example.com
+l: Los Angeles
+
+dn: uid=dthorud,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: dthorud
+cn: David Thorud
+sn: Thorud
+userPassword: david
+displayName: David Thorud
+mail: dthorud@example.com
+l: New York
+
+dn: uid=nopasswd,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: nopasswd
+cn: No Password
+sn: np
+displayName: No Password
+mail: nopasswd@example.com
+l: Chicago
+
+dn: ou=Clients,ou=Enterprise,ou=Principal,ou=system
+objectClass: organizationalUnit
+objectClass: top
+ou: Clients
+
+dn: uid=sbanks,ou=Clients,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: sbanks
+cn: Sarah Banks
+sn: Banks
+userPassword: sarah
+displayName: S.Banks
+mail: sbanks@example.com
+l: Chicago
+
+dn: uid=ealexand,ou=Clients,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: ealexand
+cn: Erin Alexander
+sn: Alexander
+userPassword: erin
+displayName: E.Alexander
+mail: ealexand@example.com
+l: Chicago
+
+dn: ou=Groups,ou=Enterprise,ou=Principal,ou=system
+objectClass: organizationalUnit
+objectClass: top
+ou: Groups
+
+dn: cn=Admins,ou=Groups,ou=Enterprise,ou=Principal,ou=system
+objectClass: groupOfNames
+objectClass: top
+cn: Admins
+member: uid=admin,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+member: uid=pbanks,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+
+dn: cn=Viewers,ou=Groups,ou=Enterprise,ou=Principal,ou=system
+objectClass: groupOfNames
+objectClass: top
+cn: Viewers
+member: uid=sbanks,ou=Clients,ou=Enterprise,ou=Principal,ou=system
+member: uid=ealexand,ou=Clients,ou=Enterprise,ou=Principal,ou=system
+
+
