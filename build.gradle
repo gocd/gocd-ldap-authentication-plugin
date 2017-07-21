@@ -1,5 +1,3 @@
-import java.security.MessageDigest
-
 /*
  * Copyright 2017 ThoughtWorks, Inc.
  *
@@ -42,7 +40,7 @@ def releaseRevision = { ->
   return hashStdOut.size().toString()
 }
 
-def PLUGIN_VERSION = '1.0.0'
+def PLUGIN_VERSION = '1.0.1'
 def DIST_VERSION = releaseRevision()
 def GIT_REVISION = gitRevision()
 
@@ -152,10 +150,16 @@ processResources {
   }
 }
 
-jar {
-  finalizedBy 'checksumJar'
+jar { jarTask ->
   preserveFileTimestamps = false
   reproducibleFileOrder = true
+
+  ['MD5', 'SHA1', 'SHA-256'].each { algo ->
+    jarTask.outputs.files("${jarTask.archivePath}.${algo}")
+    jarTask.doLast {
+      ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
+    }
+  }
 
   manifest {
     attributes(
@@ -178,40 +182,18 @@ jar {
 //  }
 }
 
-static def checksum(File file, String algorithm) {
-  def digester = MessageDigest.getInstance(algorithm)
-  file.eachByte(8192) { bfr, num ->
-    digester.update(bfr, 0, num)
-  }
-  return digester.digest().encodeHex()
-}
-
-task checksumJar {
-  def md5 = project.file("${jar.archivePath}.MD5")
-  def sha1 = project.file("${jar.archivePath}.SHA1")
-  def sha256 = project.file("${jar.archivePath}.SHA256")
-
-  inputs.files(jar.archivePath)
-  outputs.files(md5)
-  outputs.files(sha1)
-  outputs.files(sha256)
-  doFirst {
-    md5.write("${checksum(jar.archivePath, 'MD5')}  ${jar.archivePath.name}\n")
-    sha1.write("${checksum(jar.archivePath, 'SHA-1')}  ${jar.archivePath.name}\n")
-    sha256.write("${checksum(jar.archivePath, 'SHA-256')}  ${jar.archivePath.name}\n")
-  }
-}
-
 github {
   owner = System.getenv('GITHUB_USER') ?: 'bob'
   repo = 'gocd-ldap-authentication-plugin'
   token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
   tagName = PLUGIN_VERSION
+  name = PLUGIN_VERSION
   targetCommitish = project.gitRevision
   body = """
       # Version ${fullVersion}
 
-      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName}
-    """.stripIndent()
-  assets = checksumJar.outputs.files + jar.archivePath
+      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName.replaceAll(/[^A-Za-z0-9]/, '')}
+    """.stripIndent().trim()
+
+  assets = jar.outputs.files.files
 }
