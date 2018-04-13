@@ -28,6 +28,32 @@ displayName: Bob Ford
 mail: bford@example.com
 l: New York
 
+dn: uid=neil,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: neil
+cn: Neil Parker
+sn: Parker
+userPassword: neil
+displayName: Neil Parker
+mail: neil@example.com
+l: New York
+
+dn: uid=neilanderson,ou=Employees,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: aneil
+cn: Neil Anderson
+sn: Anderson
+userPassword: neil
+displayName: Neil Anderson
+mail: aneil@example.com
+l: New York
+
 dn: uid=pbanks,ou=Employees,ou=Enterprise,ou=Principal,ou=system
 objectClass: top
 objectClass: person

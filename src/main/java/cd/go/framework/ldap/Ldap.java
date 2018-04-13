@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.List;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static cd.go.authentication.ldap.utils.Util.isNotBlank;
+import static java.text.MessageFormat.format;
 import static javax.naming.Context.SECURITY_CREDENTIALS;
 import static javax.naming.Context.SECURITY_PRINCIPAL;
 
@@ -43,10 +44,10 @@ public class Ldap {
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
 
         try {
-            List<SearchResult> results = search(dirContext, ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT);
+            List<SearchResult> results = search(dirContext, ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT, true);
 
             if (results.isEmpty())
-                throw new RuntimeException("User " + username + " does not exist in " + ldapConfiguration.getLdapUrl());
+                throw new RuntimeException(format("User {0} does not exist in {1}", username, ldapConfiguration.getLdapUrl()));
 
             SearchResult searchResult = results.get(0);
             Attributes attributes = searchResult.getAttributes();
@@ -55,9 +56,20 @@ public class Ldap {
             authenticate(ldapConfiguration, userDn, password);
             return mapper.mapFromResult(attributes);
 
+        } catch (SearchResultLimitExceededException e) {
+            throw new RuntimeException(foundMultipleUserForAuthenticationErrorMessage(username, e));
         } finally {
             closeContextSilently(dirContext);
         }
+    }
+
+    private String foundMultipleUserForAuthenticationErrorMessage(String username, SearchResultLimitExceededException e) {
+        StringBuilder messageBuilder = new StringBuilder()
+                .append(format("Found multiple users in search base `{0}` with username `{1}`. ", e.getSearchBase(), username));
+        if (ldapConfiguration.getUserLoginFilter().contains("*")) {
+            messageBuilder.append("It is not recommended to have wildcard(`*{0}*`, `{0}*` or `*{0}`) in `UserLoginFilter` field as it can match other users.");
+        }
+        return messageBuilder.toString();
     }
 
     public <T> List<T> search(String filter, Object[] filterArgs, AbstractMapper<T> mapper, int maxResult) throws NamingException {
@@ -65,7 +77,7 @@ public class Ldap {
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
 
         try {
-            List<SearchResult> searchResults = search(dirContext, filter, filterArgs, maxResult);
+            List<SearchResult> searchResults = search(dirContext, filter, filterArgs, maxResult, false);
 
             for (SearchResult result : searchResults) {
                 results.add(mapper.mapFromResult(result.getAttributes()));
@@ -77,7 +89,7 @@ public class Ldap {
         return results;
     }
 
-    private DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
+    private final DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
         Hashtable<String, Object> environments = new Environment(ldapConfiguration).getEnvironments();
         if (isNotBlank(username)) {
             environments.put(SECURITY_PRINCIPAL, username);
@@ -96,25 +108,36 @@ public class Ldap {
         return context;
     }
 
-    private List<SearchResult> search(DirContext context, String filter, Object[] filterArgs, int maxResult) throws NamingException {
-        List<SearchResult> results = new ArrayList<>();
+    private List<SearchResult> search(DirContext context, String filter, Object[] filterArgs, int maxResult, boolean isHardLimitOnMaxResult) throws NamingException {
+        final List<SearchResult> results = new ArrayList<>();
+
         for (String base : ldapConfiguration.getSearchBases()) {
-            NamingEnumeration<SearchResult> searchResults = null;
-            try {
-                searchResults = context.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
-                while (searchResults.hasMore() && results.size() < maxResult) {
-                    results.add(searchResults.next());
-                }
-                if (results.size() >= maxResult) {
-                    break;
-                }
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-            } finally {
-                closeNamingEnumerationSilently(searchResults);
-            }
+            results.addAll(searchInBase(context, base, filter, filterArgs, maxResult, isHardLimitOnMaxResult));
         }
 
+        return results;
+    }
+
+    private List<SearchResult> searchInBase(DirContext context, String base, String filter, Object[] filterArgs, int maxResult, boolean isHardLimitOnMaxResult) throws NamingException {
+        List<SearchResult> results = new ArrayList<>();
+        NamingEnumeration<SearchResult> searchResults = null;
+        try {
+            LOG.debug(format("Searching user in search base {0} using search filter {1}.", base, filter));
+            searchResults = context.search(base, filter, filterArgs, getSimpleSearchControls(maxResult));
+            while (searchResults.hasMoreElements() && results.size() < maxResult) {
+                results.add(searchResults.next());
+            }
+
+            if (isHardLimitOnMaxResult && searchResults.hasMoreElements()) {
+                throw new SearchResultLimitExceededException(maxResult, base);
+            }
+
+            if (results.size() >= maxResult) {
+                return results;
+            }
+        } finally {
+            closeNamingEnumerationSilently(searchResults);
+        }
         return results;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package cd.go.framework.ldap;
 
 import cd.go.authentication.ldap.BaseIntegrationTest;
+import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
@@ -25,23 +26,22 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import javax.naming.AuthenticationException;
+import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import java.util.List;
 
 import static java.text.MessageFormat.format;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class LdapIntegrationTest extends BaseIntegrationTest {
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void shouldAuthenticateUser() throws Exception {
+    public void authenticate_shouldAuthenticateUser() throws Exception {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
@@ -55,7 +55,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldErrorOutIfFailToAuthenticateUser() throws Exception {
+    public void authenticate_shouldErrorOutIfFailToAuthenticateUser() throws Exception {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
@@ -69,7 +69,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldErrorOutUserIsNotExistInLdap() throws Exception {
+    public void authenticate_shouldErrorOutUserIsNotExistInLdap() throws Exception {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
@@ -83,7 +83,18 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldSearchUser() throws Exception {
+    public void authenticate_shouldErrorOutIfMultipleUserDetectedInSearchBaseWhenUserLoginFilterHasWildCard() throws NamingException {
+        LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"}, "(uid=*{0}*)");
+        final Ldap ldap = new Ldap(ldapConfiguration);
+
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("Found multiple users in search base `ou=system` with username `neil`. It is not recommended to have wildcard(`*{0}*`, `{0}*` or `*{0}`) in `UserLoginFilter` field as it can match other users.");
+
+        ldap.authenticate("neil", "neil", ldapConfiguration.getUserMapper(new UsernameResolver()));
+    }
+
+    @Test
+    public void search_shouldSearchUser() throws Exception {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"});
 
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
@@ -96,7 +107,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldSearchUsersFromMultipleSearchBases() throws Exception {
+    public void search_shouldSearchUsersFromMultipleSearchBases() throws Exception {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
 
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
@@ -106,5 +117,44 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         assertThat(users, hasSize(2));
         assertThat(users, containsInAnyOrder(new User("pbanks", "P.Banks", "pbanks@example.com"), new User("sbanks", "S.Banks", "sbanks@example.com")));
         verify(ldapSpy).closeContextSilently(any(DirContext.class));
+    }
+
+
+    @Test
+    public void search_shouldLimitSearchResults() throws Exception {
+        final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
+        final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
+
+        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+
+        final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
+
+        assertThat(allUsers, hasSize(6));
+
+        final List<User> usersWhenMaxResultSpecified = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
+
+        assertThat(usersWhenMaxResultSpecified, hasSize(3));
+        verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
+    }
+
+    @Test
+    public void validate_shouldValidateManagerDnAndPassword() {
+        LdapConfiguration ldapConfiguration = ldapConfiguration("uid=admin,ou=system", "secret", "ou=system");
+
+        try {
+            new Ldap(ldapConfiguration).validate();
+        } catch (Exception e) {
+            fail("Should not error out when valid credentials provided");
+        }
+    }
+
+    @Test
+    public void validate_shouldErrorOutWhenInvalidManagerDnAndPasswordProvided() throws NamingException {
+        LdapConfiguration ldapConfiguration = ldapConfiguration("uid=admin,ou=system", "invalid-password", "ou=system");
+
+        thrown.expect(AuthenticationException.class);
+        thrown.expectMessage("LDAP: error code 49 - INVALID_CREDENTIALS: Bind failed: ERR_229 Cannot authenticate user uid=admin,ou=system");
+
+        new Ldap(ldapConfiguration).validate();
     }
 }
