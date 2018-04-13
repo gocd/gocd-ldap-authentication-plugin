@@ -121,19 +121,36 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
 
     @Test
-    public void search_shouldLimitSearchResults() throws Exception {
-        final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
+    public void search_shouldLimitTheSearchResults() throws Exception {
+        final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
 
         final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
-        assertThat(allUsers, hasSize(6));
+        assertThat(allUsers, hasSize(5));
 
         final List<User> usersWhenMaxResultSpecified = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
 
         assertThat(usersWhenMaxResultSpecified, hasSize(3));
+        verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
+    }
+
+    @Test
+    public void search_shouldLimitTheSearchResultsAcrossSearchBases() throws Exception {
+        final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
+        final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
+
+        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+
+        final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
+
+        assertThat(allUsers, hasSize(5));
+
+        final List<User> usersWhenMaxResultSpecified = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 4);
+
+        assertThat(usersWhenMaxResultSpecified, hasSize(4));
         verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
     }
 

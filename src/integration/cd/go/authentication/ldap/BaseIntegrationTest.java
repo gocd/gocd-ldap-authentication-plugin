@@ -66,7 +66,7 @@ public abstract class BaseIntegrationTest extends AbstractLdapTestUnit {
         configuration.put("ManagerDN", managerDN);
         configuration.put("Password", password);
         configuration.put("UserLoginFilter", userLoginFilter);
-        configuration.put("UserSearchFilter", "(cn={0})");
+        configuration.put("UserSearchFilter", "(uid=*{0}*)");
         configuration.put("UserNameAttribute", "uid");
         configuration.put("DisplayNameAttribute", "displayName");
         return configuration;

@@ -46,8 +46,9 @@ public class Ldap {
         try {
             List<SearchResult> results = search(dirContext, ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT, true);
 
-            if (results.isEmpty())
+            if (results.isEmpty()) {
                 throw new RuntimeException(format("User {0} does not exist in {1}", username, ldapConfiguration.getLdapUrl()));
+            }
 
             SearchResult searchResult = results.get(0);
             Attributes attributes = searchResult.getAttributes();
@@ -111,15 +112,31 @@ public class Ldap {
     private List<SearchResult> search(DirContext context, String filter, Object[] filterArgs, int maxResult, boolean isHardLimitOnMaxResult) throws NamingException {
         final List<SearchResult> results = new ArrayList<>();
 
+        if (maxResult == 0) {
+            return results;
+        }
+
         for (String base : ldapConfiguration.getSearchBases()) {
-            results.addAll(searchInBase(context, base, filter, filterArgs, maxResult, isHardLimitOnMaxResult));
+            final int remainingResultCount = maxResult - results.size();
+
+            final List<SearchResult> searchResultsFromSearchBase = searchInBase(context, base, filter, filterArgs, remainingResultCount, isHardLimitOnMaxResult);
+            results.addAll(searchResultsFromSearchBase);
+
+            if (results.size() >= maxResult) {
+                break;
+            }
         }
 
         return results;
     }
 
     private List<SearchResult> searchInBase(DirContext context, String base, String filter, Object[] filterArgs, int maxResult, boolean isHardLimitOnMaxResult) throws NamingException {
-        List<SearchResult> results = new ArrayList<>();
+        final List<SearchResult> results = new ArrayList<>();
+
+        if (maxResult == 0) {
+            return results;
+        }
+
         NamingEnumeration<SearchResult> searchResults = null;
         try {
             LOG.debug(format("Searching user in search base {0} using search filter {1}.", base, filter));
@@ -152,9 +169,10 @@ public class Ldap {
     private static SearchControls getSimpleSearchControls(int maxResult) {
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        searchControls.setTimeLimit(5000); // timeout after five seconds
-        if (maxResult != 0)
+        searchControls.setTimeLimit(5000);
+        if (maxResult != 0) {
             searchControls.setCountLimit(maxResult);
+        }
         return searchControls;
     }
 
