@@ -148,10 +148,6 @@ public class Ldap {
             if (isHardLimitOnMaxResult && searchResults.hasMoreElements()) {
                 throw new SearchResultLimitExceededException(maxResult, base);
             }
-
-            if (results.size() >= maxResult) {
-                return results;
-            }
         } finally {
             closeNamingEnumerationSilently(searchResults);
         }

@@ -56,8 +56,7 @@
       <label ng-class="{'is-invalid-label': GOINPUTNAME[SearchBases].$error.server}">Search Base:<span class='asterix'>*</span></label>
       <textarea ng-class="{'is-invalid-input': GOINPUTNAME[SearchBases].$error.server}" type="text" ng-model="SearchBases" ng-required="true" rows="3" placeholder=""></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[SearchBases].$error.server}" ng-show="GOINPUTNAME[SearchBases].$error.server">{{GOINPUTNAME[SearchBases].$error.server}}</span>
-      <label class="form-help-content">This field defines the location in the directory from which the LDAP search begins. You can provide multiple
-            search bases. If multiple search bases are configured the plugin would look for the user in each search base
+      <label class="form-help-content">This field defines the location in the directory from which the LDAP search begins. You can provide multiple search bases separated by newlines. If multiple search bases are configured the plugin would look for the user in each search base
             sequentially until the user is found.
         <div class="code">
           ou=users,ou=system<br/>

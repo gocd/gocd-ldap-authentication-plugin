@@ -121,7 +121,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
 
     @Test
-    public void search_shouldLimitTheSearchResults() throws Exception {
+    public void search_shouldStopSearchingWhenSpecifiedNumberOfUsersFoundInFirstSearchBase() throws Exception {
         final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
@@ -131,14 +131,14 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         assertThat(allUsers, hasSize(5));
 
-        final List<User> usersWhenMaxResultSpecified = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
+        final List<User> userFoundFromFirstSearchBase = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
 
-        assertThat(usersWhenMaxResultSpecified, hasSize(3));
+        assertThat(userFoundFromFirstSearchBase, hasSize(3));
         verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
     }
 
     @Test
-    public void search_shouldLimitTheSearchResultsAcrossSearchBases() throws Exception {
+    public void search_shouldSearchAcrossMultipleSearchBasesAndLimitTheSearchResult() throws Exception {
         final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
@@ -148,9 +148,9 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         assertThat(allUsers, hasSize(5));
 
-        final List<User> usersWhenMaxResultSpecified = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 4);
+        final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 4);
 
-        assertThat(usersWhenMaxResultSpecified, hasSize(4));
+        assertThat(users, hasSize(4));
         verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
     }
 

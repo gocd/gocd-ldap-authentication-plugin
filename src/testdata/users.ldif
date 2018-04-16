@@ -15,6 +15,11 @@ objectClass: organizationalUnit
 objectClass: top
 ou: Employees
 
+dn: ou=Dummy,ou=Enterprise,ou=Principal,ou=system
+objectClass: organizationalUnit
+objectClass: top
+ou: Dummy
+
 dn: uid=bob,ou=Employees,ou=Enterprise,ou=Principal,ou=system
 objectClass: top
 objectClass: person
@@ -152,7 +157,6 @@ cn: User 1
 sn: 1
 userPassword: user_1
 displayName: User 1
-
 
 dn: uid=user_2,ou=Employees,ou=Enterprise,ou=Principal,ou=system
 objectClass: top
@@ -1939,3 +1943,27 @@ cn: User 175
 sn: 175
 userPassword: user_175
 displayName: User 175
+
+
+dn: uid=user_201,ou=Dummy,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: user_201
+cn: User 201
+sn: 201
+userPassword: user_201
+displayName: User 201
+
+
+dn: uid=user_202,ou=Dummy,ou=Enterprise,ou=Principal,ou=system
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+uid: user_202
+cn: User 202
+sn: 202
+userPassword: user_202
+displayName: User 202

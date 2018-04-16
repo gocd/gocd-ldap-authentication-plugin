@@ -45,7 +45,7 @@ public class SearchUserExecutor implements RequestExecutor {
         this(request, new LdapFactory());
     }
 
-    protected SearchUserExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
+    SearchUserExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
         this.request = request;
         this.ldapFactory = ldapFactory;
     }
@@ -76,9 +76,10 @@ public class SearchUserExecutor implements RequestExecutor {
                 final List<User> users = ldap.search(userSearchFilter, new String[]{searchTerm}, configuration.getUserMapper(new UsernameResolver()), remainingResultCount);
                 allUsers.addAll(users);
 
-                if (users.size() >= MAX_SEARCH_RESULT) {
+                if (allUsers.size() >= MAX_SEARCH_RESULT) {
                     break;
                 }
+
             } catch (Exception e) {
                 LOG.error(String.format("[User Search] Failed to search user using auth_config: `%s`", authConfig.getId()), e);
             }
