@@ -16,15 +16,12 @@
 
 package cd.go.authentication.ldap.executor;
 
-import cd.go.authentication.ldap.LdapPlugin;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
 import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
-import cd.go.framework.ldap.filter.LikeFilter;
-import cd.go.framework.ldap.filter.OrFilter;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -39,6 +36,7 @@ import static cd.go.authentication.ldap.utils.Util.GSON;
 
 public class SearchUserExecutor implements RequestExecutor {
     public static final String SEARCH_TERM = "search_term";
+    private static final int MAX_SEARCH_RESULT = 100;
 
     private final GoPluginApiRequest request;
     private final LdapFactory ldapFactory;
@@ -47,13 +45,13 @@ public class SearchUserExecutor implements RequestExecutor {
         this(request, new LdapFactory());
     }
 
-    protected SearchUserExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
+    SearchUserExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
         this.request = request;
         this.ldapFactory = ldapFactory;
     }
 
     @Override
-    public GoPluginApiResponse execute() throws Exception {
+    public GoPluginApiResponse execute() {
         Map<String, String> requestParam = GSON.fromJson(request.requestBody(), Map.class);
         String searchTerm = requestParam.get(SEARCH_TERM);
         List<AuthConfig> authConfigs = AuthConfig.fromJSONList(request.requestBody());
@@ -64,8 +62,9 @@ public class SearchUserExecutor implements RequestExecutor {
     }
 
     Set<User> searchUsers(String searchTerm, List<AuthConfig> authConfigs) {
-        Set<User> allUsers = new HashSet<>();
+        final Set<User> allUsers = new HashSet<>();
         for (AuthConfig authConfig : authConfigs) {
+            final int remainingResultCount = MAX_SEARCH_RESULT - allUsers.size();
             try {
                 final LdapConfiguration configuration = authConfig.getConfiguration();
                 final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
@@ -74,10 +73,13 @@ public class SearchUserExecutor implements RequestExecutor {
                 LOG.info(String.format("[User Search] Looking up for users matching search_term: `%s`" +
                         " using the search_filter: `%s` and auth_config: `%s`", searchTerm, userSearchFilter, authConfig.getId()));
 
-                List<User> users = ldap.search(userSearchFilter, new String[] {searchTerm}, configuration.getUserMapper(new UsernameResolver()), 100);
+                final List<User> users = ldap.search(userSearchFilter, new String[]{searchTerm}, configuration.getUserMapper(new UsernameResolver()), remainingResultCount);
                 allUsers.addAll(users);
-                if (users.size() == 100)
+
+                if (allUsers.size() >= MAX_SEARCH_RESULT) {
                     break;
+                }
+
             } catch (Exception e) {
                 LOG.error(String.format("[User Search] Failed to search user using auth_config: `%s`", authConfig.getId()), e);
             }

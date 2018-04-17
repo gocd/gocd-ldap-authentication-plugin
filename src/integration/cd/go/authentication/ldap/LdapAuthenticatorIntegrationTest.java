@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
     @Test
-    public void shouldAuthenticateUser() throws Exception {
+    public void shouldAuthenticateUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
         AuthConfig authConfig = new AuthConfig("auth_config", ldapConfiguration);
 
@@ -74,7 +74,7 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNullIfUserDoesNotExistInLdap() throws Exception {
+    public void shouldReturnNullIfUserDoesNotExistInLdap() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
         AuthConfig authConfig = new AuthConfig("auth_config", ldapConfiguration);
 
@@ -86,11 +86,23 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNullIfNoPasswordProvided() throws Exception {
+    public void shouldReturnNullIfNoPasswordProvided() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
         AuthConfig authConfig = new AuthConfig("auth_config", ldapConfiguration);
 
         final Credentials credentials = new Credentials("nopasswd", "");
+
+        final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
+
+        assertNull(response);
+    }
+
+    @Test
+    public void authenticate_shouldNotPerformAuthenticationAndReturnNullWhenMultipleUsersFoundInASearchBaseForGivenUsername() {
+        LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"}, "(uid=*{0}*)");
+        AuthConfig authConfig = new AuthConfig("auth_config", ldapConfiguration);
+
+        final Credentials credentials = new Credentials("neil", "neil");
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 

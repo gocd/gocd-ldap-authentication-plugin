@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,17 +37,39 @@ import java.util.Map;
 public abstract class BaseIntegrationTest extends AbstractLdapTestUnit {
 
     protected LdapConfiguration ldapConfiguration(String[] searchBases) {
+        Map<String, String> configuration = configAsMap("uid=admin,ou=system", "secret", "(uid={0})", searchBases
+        );
+
+        return LdapConfiguration.fromJSON(new Gson().toJson(configuration));
+    }
+
+    protected LdapConfiguration ldapConfiguration(String[] searchBases, String userLoginFilter) {
+        Map<String, String> configuration = configAsMap(
+                "uid=admin,ou=system", "secret", userLoginFilter, searchBases
+        );
+
+        return LdapConfiguration.fromJSON(new Gson().toJson(configuration));
+    }
+
+    protected LdapConfiguration ldapConfiguration(String username, String password, String... searchBases) {
+        Map<String, String> configuration = configAsMap(
+                username, password, "(uid={0})", searchBases
+        );
+
+        return LdapConfiguration.fromJSON(new Gson().toJson(configuration));
+    }
+
+    private Map<String, String> configAsMap(String managerDN, String password, String userLoginFilter, String[] searchBases) {
         Map<String, String> configuration = new HashMap<>();
         configuration.put("Url", String.format("ldap://localhost:%s", ldapServer.getPort()));
         configuration.put("SearchBases", StringUtils.join(searchBases, "\n"));
-        configuration.put("ManagerDN", "uid=admin,ou=system");
-        configuration.put("Password", "secret");
-        configuration.put("UserLoginFilter", "(uid={0})");
-        configuration.put("UserSearchFilter", "(cn={0})");
+        configuration.put("ManagerDN", managerDN);
+        configuration.put("Password", password);
+        configuration.put("UserLoginFilter", userLoginFilter);
+        configuration.put("UserSearchFilter", "(uid=*{0}*)");
         configuration.put("UserNameAttribute", "uid");
         configuration.put("DisplayNameAttribute", "displayName");
-
-        return LdapConfiguration.fromJSON(new Gson().toJson(configuration));
+        return configuration;
     }
 
 }
