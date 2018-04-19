@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.0.2
+
+- Deny authentication when multiple user's matches to the username using UserLoginFilter in a search base
+
 # 1.0.1
 
 - Cleanup the build script. No changes in functionality
