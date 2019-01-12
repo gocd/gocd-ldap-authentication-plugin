@@ -54,7 +54,7 @@ public class LdapAuthenticator {
         final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
 
         try {
-            LOG.info(String.format("[Authenticate] Authenticating User: %s using auth_config: %s", credentials.getUsername(), authConfigId));
+            LOG.debug(String.format("[Authenticate] Authenticating User: %s using auth_config: %s", credentials.getUsername(), authConfigId));
             Attributes attributes = ldap.authenticate(credentials.getUsername(), credentials.getPassword(), new AttributesMapper());
             User user = configuration.getUserMapper(new UsernameResolver(credentials.getUsername())).mapFromResult(attributes);
             if (user != null) {
@@ -62,7 +62,8 @@ public class LdapAuthenticator {
                 return new AuthenticationResponse(user, authConfig);
             }
         } catch (Exception e) {
-            LOG.error("[Authenticate] Failed to authenticate user " + credentials.getUsername() + " on " + configuration.getLdapUrl() + ". ", e);
+            LOG.info("[Authenticate] Failed to authenticate user " + credentials.getUsername() + " on " + configuration.getLdapUrl() + ". ");
+            LOG.debug("Exception: ", e);
         }
         return null;
     }
