@@ -1,10 +1,16 @@
 # Changelog
 
-# 1.0.2
+## 1.0.3
 
-- Deny authentication when multiple user's matches to the username using UserLoginFilter in a search base
+- [#43](https://github.com/gocd/gocd-ldap-authentication-plugin/pull/43) - Cleaner logs by default
 
-# 1.0.1
+  - Logs won't show stack traces by default for a failed authentication. Can turn on DEBUG logging to see stack traces.
+
+## 1.0.2
+
+- [#39](https://github.com/gocd/gocd-ldap-authentication-plugin/pull/39) - Deny authentication when multiple user's matches to the username using UserLoginFilter in a search base
+
+## 1.0.1
 
 - Cleanup the build script. No changes in functionality
 
