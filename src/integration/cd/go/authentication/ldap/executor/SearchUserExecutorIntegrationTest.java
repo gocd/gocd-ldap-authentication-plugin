@@ -131,3 +131,4 @@ public class SearchUserExecutorIntegrationTest extends BaseIntegrationTest {
         return request;
     }
 }
+

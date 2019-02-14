@@ -66,6 +66,8 @@ public class LdapPluginIntegrationTest extends BaseIntegrationTest {
 
         final String expectedJSON = "{\n" +
                 "  \"can_search\": true,\n" +
+                "  \"can_authorize\": false,\n" +
+                "  \"can_get_user_roles\": false,\n" +
                 "  \"supported_auth_type\": \"password\"\n" +
                 "}";
 

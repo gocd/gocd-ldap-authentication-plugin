@@ -39,7 +39,9 @@ public class GetCapabilitiesExecutorTest {
 
         String expectedJSON = "{\n" +
                 "    \"supported_auth_type\":\"password\",\n" +
-                "    \"can_search\":true\n" +
+                "    \"can_search\":true,\n" +
+                "    \"can_authorize\":false,\n" +
+                "    \"can_get_user_roles\":false\n" +
                 "}";
 
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
@@ -50,7 +52,7 @@ public class GetCapabilitiesExecutorTest {
         GoPluginApiResponse response = new GetCapabilitiesExecutor() {
             @Override
             Capabilities getCapabilities() {
-                return new Capabilities(SupportedAuthType.Web, true);
+                return new Capabilities(SupportedAuthType.Web, true, false, false);
             }
         }.execute();
         Capabilities capabilities = Capabilities.fromJSON(response.responseBody());
@@ -61,11 +63,11 @@ public class GetCapabilitiesExecutorTest {
 
         String expectedJSON = "{\n" +
                 "    \"supported_auth_type\":\"web\",\n" +
-                "    \"can_search\":true\n" +
+                "    \"can_search\":true,\n" +
+                "    \"can_authorize\":false,\n" +
+                "    \"can_get_user_roles\":false\n" +
                 "}";
 
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
     }
-
-
 }
