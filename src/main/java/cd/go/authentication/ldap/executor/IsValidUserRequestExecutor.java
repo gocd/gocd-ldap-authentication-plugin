@@ -76,7 +76,7 @@ public class IsValidUserRequestExecutor implements RequestExecutor {
             final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
             String userSearchFilter = configuration.getUserSearchFilter();
 
-            LOG.info(String.format("[Is User Valid] Looking up for user with name: `%s`" +
+            LOG.debug(String.format("[Is User Valid] Looking up for user with name: `%s`" +
                     " using the search_filter: `%s` and auth_config: `%s`", usernameToCheck, userSearchFilter, authConfig.getId()));
 
             final List<User> users = ldap.search(userSearchFilter, new String[]{usernameToCheck}, configuration.getUserMapper(new UsernameResolver()), MAX_SEARCH_RESULT);
