@@ -69,6 +69,8 @@ public class LdapPlugin implements GoPlugin {
                     return new UserAuthenticationExecutor(request, new LdapAuthenticator()).execute();
                 case REQUEST_SEARCH_USERS:
                     return new SearchUserExecutor(request).execute();
+                case REQUEST_IS_VALID_USER:
+                    return new IsValidUserRequestExecutor(request).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }
