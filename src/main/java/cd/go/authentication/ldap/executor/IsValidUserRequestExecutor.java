@@ -80,7 +80,7 @@ public class IsValidUserRequestExecutor implements RequestExecutor {
                     " using the search_filter: `%s` and auth_config: `%s`", usernameToCheck, userSearchFilter, authConfig.getId()));
 
             final List<User> users = ldap.search(userSearchFilter, new String[]{usernameToCheck}, configuration.getUserMapper(new UsernameResolver()), MAX_SEARCH_RESULT);
-            return users.stream().filter(user -> user.getUsername().equals(usernameToCheck)).collect(Collectors.toList()).get(0);
+            return users.stream().filter(user -> user.getUsername().equalsIgnoreCase(usernameToCheck)).collect(Collectors.toList()).get(0);
         } catch (Exception e) {
             LOG.error(String.format("[Is User Valid] Failed to find user with name `%s` using auth_config: `%s`", usernameToCheck, authConfig.getId()), e);
         }

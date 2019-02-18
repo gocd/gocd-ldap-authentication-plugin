@@ -55,6 +55,19 @@ public class IsValidUserExecutorIntegrationTest extends BaseIntegrationTest {
         verify(ldapFactory, times(2)).ldapForConfiguration(firstLdapConfig);
     }
 
+    @Test
+    public void shouldCheckForCaseInsensitiveUsername() {
+        final LdapConfiguration firstLdapConfig = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"});
+        AuthConfig first = new AuthConfig("2", firstLdapConfig);
+
+        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("user_1", first), ldapFactory).execute().responseCode(), is(200));
+        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("UsEr_1", first), ldapFactory).execute().responseCode(), is(200));
+
+        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("user", first), ldapFactory).execute().responseCode(), is(404));
+
+        verify(ldapFactory, times(3)).ldapForConfiguration(firstLdapConfig);
+    }
+
     private GoPluginApiRequest createGoPluginApiRequest(String username, AuthConfig authConfig) {
         final Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("username", username);
