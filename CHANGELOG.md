@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.0
+
+* [#44](https://github.com/gocd/gocd-ldap-authentication-plugin/pull/44) Implement authorization extension v2 to support:
+  - 'get-user-roles' capabilities
+  - 'is-valid-user' authorization extension request
+
 ## 1.0.3
 
 - [#43](https://github.com/gocd/gocd-ldap-authentication-plugin/pull/43) - Cleaner logs by default
