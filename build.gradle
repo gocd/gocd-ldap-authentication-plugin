@@ -14,51 +14,32 @@
  * limitations under the License.
  */
 
-plugins {
-  id 'co.riiid.gradle' version '0.4.2'
-}
-
 apply plugin: 'java'
+apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
 
-def gitRevision = { ->
-  def hashStdOut = new ByteArrayOutputStream()
-  exec {
-    commandLine "git", "log", "-n", "1", "--format=%H"
-    standardOutput = hashStdOut
+gocdPlugin {
+  id = 'cd.go.authentication.ldap'
+  pluginVersion = '2.0.0'
+  goCdVersion = '17.5.0'
+  name = 'LDAP Authentication Plugin for GoCD'
+  description = 'LDAP Authentication Plugin for GoCD'
+  vendorName = 'ThoughtWorks, Inc.'
+  vendorUrl = 'https://github.com/gocd/gocd-ldap-authentication-plugin'
+
+  githubRepo {
+    owner = System.getenv('GITHUB_USER') ?: 'bob'
+    repo = 'gocd-ldap-authentication-plugin'
+    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
   }
 
-  return hashStdOut.toString().trim()
+  pluginProject = project
+
+  prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+  assetsToRelease = [project.tasks.jar]
 }
-
-def releaseRevision = { ->
-  def hashStdOut = new ByteArrayOutputStream()
-  exec {
-    commandLine "git", "log", "--pretty=format:"
-    standardOutput = hashStdOut
-  }
-
-  return hashStdOut.size().toString()
-}
-
-def PLUGIN_VERSION = '2.0.0'
-def DIST_VERSION = releaseRevision()
-def GIT_REVISION = gitRevision()
 
 group = 'cd.go'
-rootProject.ext.distVersion = DIST_VERSION
-rootProject.ext.fullVersion = DIST_VERSION ? "${PLUGIN_VERSION}-${DIST_VERSION}" : PLUGIN_VERSION
-rootProject.ext.gitRevision = GIT_REVISION
-version = project.fullVersion
-
-project.ext.pluginDesc = [
-  id         : 'cd.go.authentication.ldap',
-  version    : project.fullVersion,
-  goCdVersion: '17.5.0',
-  name       : 'LDAP Authentication Plugin for GoCD',
-  description: 'LDAP Authentication Plugin for GoCD',
-  vendorName : 'GoCD Contributors',
-  vendorUrl  : 'https://github.com/gocd/gocd-ldap-authentication-plugin'
-]
+version = gocdPlugin.fullVersion(project)
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -103,32 +84,6 @@ dependencies {
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-all', version: '2.0.0-M24'
 }
 
-tasks.withType(Test) { testTask ->
-
-  testLogging {
-    showStandardStreams = true
-
-    exceptionFormat 'full'
-
-    beforeSuite { suite ->
-      if (suite.parent) {
-        logger.quiet("Running ${suite.name}")
-      }
-    }
-
-    afterSuite { suite, result ->
-      if (suite.parent) {
-        logger.quiet("Tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
-        if (result.resultType == TestResult.ResultType.FAILURE) {
-          logger.quiet("Test ${suite.name} FAILED")
-        }
-      } else {
-        logger.quiet("Total tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
-      }
-    }
-  }
-}
-
 task integrationTest(type: Test, description: 'Runs the ldap integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
@@ -138,62 +93,8 @@ task integrationTest(type: Test, description: 'Runs the ldap integration tests.'
 
 check.dependsOn integrationTest
 
-processResources {
-  from("src/main/resource-templates") {
-    filesMatching('plugin.xml') {
-      expand project.pluginDesc
-    }
-
-    filesMatching('plugin.properties') {
-      expand project.pluginDesc
-    }
-  }
-}
-
-jar { jarTask ->
-  preserveFileTimestamps = false
-  reproducibleFileOrder = true
-
-  ['MD5', 'SHA1', 'SHA-256'].each { algo ->
-    jarTask.outputs.files("${jarTask.archivePath}.${algo}")
-    jarTask.doLast {
-      ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
-    }
-  }
-
-  manifest {
-    attributes(
-      'Go-Version': project.pluginDesc.goCdVersion,
-      'Plugin-Revision': project.pluginDesc.version,
-      'Implementation-Title': project.name,
-      'Implementation-Version': project.version,
-      'Source-Compatibility': project.sourceCompatibility,
-      'Target-Compatibility': project.targetCompatibility
-    )
-  }
-
+jar {
   from(configurations.compile) {
     into "lib/"
   }
-
-//    This is useful for debugging
-//  from(sourceSets.main.java) {
-//    into "/"
-//  }
-}
-
-github {
-  owner = System.getenv('GITHUB_USER') ?: 'bob'
-  repo = 'gocd-ldap-authentication-plugin'
-  token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
-  tagName = PLUGIN_VERSION
-  name = PLUGIN_VERSION
-  targetCommitish = project.gitRevision
-  body = """
-      # Version ${fullVersion}
-
-      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName.replaceAll(/[^A-Za-z0-9]/, '')}
-    """.stripIndent().trim()
-
-  assets = jar.outputs.files.files
 }
