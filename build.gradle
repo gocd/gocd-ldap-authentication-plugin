@@ -130,7 +130,7 @@ tasks.withType(Test) { testTask ->
 }
 
 task integrationTest(type: Test, description: 'Runs the ldap integration tests.', group: 'Verification') {
-  testClassesDir = sourceSets.integrationTest.output.classesDir
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
 
   mustRunAfter tasks.test
