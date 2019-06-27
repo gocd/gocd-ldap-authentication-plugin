@@ -80,7 +80,7 @@ dependencies {
   testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '2.1'
   testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
 
-  integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+  integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-all', version: '2.0.0-M24'
 }
 
