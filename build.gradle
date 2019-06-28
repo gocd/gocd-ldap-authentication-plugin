@@ -81,7 +81,7 @@ dependencies {
   testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
 
   integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-all', version: '2.0.0-M24'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-all', version: '2.0.0.AM25'
 }
 
 task integrationTest(type: Test, description: 'Runs the ldap integration tests.', group: 'Verification') {
