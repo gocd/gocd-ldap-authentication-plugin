@@ -22,9 +22,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
@@ -37,9 +35,9 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNotNull(response);
-        assertThat(response.getUser(), is(new User("bford", "Bob Ford", "bford@example.com")));
-        assertThat(response.getConfigUsedForAuthentication(), is(authConfig));
+        assertThat(response).isNotNull();
+        assertThat(response.getUser()).isEqualTo(new User("bford", "Bob Ford", "bford@example.com"));
+        assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfig);
     }
 
     @Test
@@ -52,10 +50,10 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNotNull(response);
-        assertThat(response.getUser(), is(new User("sbanks", "S.Banks", "sbanks@example.com")));
-        assertThat(response.getConfigUsedForAuthentication(), is(authConfig));
-        assertThat(response.getUser().getAttributes().get("dn").get().toString(), endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system"));
+        assertThat(response).isNotNull();
+        assertThat(response.getUser()).isEqualTo(new User("sbanks", "S.Banks", "sbanks@example.com"));
+        assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfig);
+        assertThat(response.getUser().getAttributes().get("dn").get().toString()).endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system");
     }
 
     @Test
@@ -67,10 +65,10 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Arrays.asList(authConfigForEmployees, authConfigForClients));
 
-        assertNotNull(response);
-        assertThat(response.getUser(), is(new User("sbanks", "S.Banks", "sbanks@example.com")));
-        assertThat(response.getConfigUsedForAuthentication(), is(authConfigForClients));
-        assertThat(response.getUser().getAttributes().get("dn").get().toString(), endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system"));
+        assertThat(response).isNotNull();
+        assertThat(response.getUser()).isEqualTo(new User("sbanks", "S.Banks", "sbanks@example.com"));
+        assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfigForClients);
+        assertThat(response.getUser().getAttributes().get("dn").get().toString()).endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system");
     }
 
     @Test
@@ -82,7 +80,7 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNull(response);
+        assertThat(response).isNull();
     }
 
     @Test
@@ -94,7 +92,7 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNull(response);
+        assertThat(response).isNull();
     }
 
     @Test
@@ -106,6 +104,6 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNull(response);
+        assertThat(response).isNull();
     }
 }

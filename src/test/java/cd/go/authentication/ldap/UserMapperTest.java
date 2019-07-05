@@ -20,25 +20,17 @@ import cd.go.authentication.ldap.exception.InvalidUsernameException;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.User;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 
-import static org.hamcrest.Matchers.any;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
-public class UserMapperTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
+class UserMapperTest {
     @Test
-    public void shouldAbleToMapUserFromValidAttributes() throws Exception {
+    void shouldAbleToMapUserFromValidAttributes() throws Exception {
         Attributes attributes = new BasicAttributes();
         attributes.put("uid", "jduke");
         attributes.put("displayName", "Java Duke");
@@ -47,11 +39,11 @@ public class UserMapperTest {
         UserMapper userMapper = new UserMapper(new UsernameResolver(), "displayName", "mail");
         User user = userMapper.mapFromResult(attributes);
 
-        assertThat(user, is(new User("jduke", "Java Duke", "jduke@example.com", null)));
+        assertThat(user).isEqualTo(new User("jduke", "Java Duke", "jduke@example.com", null));
     }
 
     @Test
-    public void shouldAbleToMapUserWithGivenUsername() throws Exception {
+    void shouldAbleToMapUserWithGivenUsername() throws Exception {
         Attributes attributes = new BasicAttributes();
         attributes.put("uid", "jduke");
         attributes.put("displayName", "Java Duke");
@@ -60,19 +52,17 @@ public class UserMapperTest {
         UserMapper userMapper = new UserMapper(new UsernameResolver("J Dude"), "displayName", "mail");
         User user = userMapper.mapFromResult(attributes);
 
-        assertThat(user, is(new User("J Dude", "Java Duke", "jduke@example.com", null)));
+        assertThat(user).isEqualTo(new User("J Dude", "Java Duke", "jduke@example.com", null));
     }
 
     @Test
-    public void shouldBarfWhenMappingUsernameFromInvalidAttributes() throws Exception {
+    void shouldBarfWhenMappingUsernameFromInvalidAttributes() throws Exception {
         Attributes attributes = new BasicAttributes();
         attributes.put("displayName", "Java Duke");
         UserMapper userMapper = new UserMapper(new UsernameResolver(), "displayName", "mail");
 
-        thrown.expect(any(InvalidUsernameException.class));
-        thrown.expectMessage("Username can not be blank. Failed to resolve username using the attributes `sAMAccountName` and `uid`.");
-        User user = userMapper.mapFromResult(attributes);
-
-        assertNull(user);
+        assertThatCode(() -> userMapper.mapFromResult(attributes))
+                .isInstanceOf(InvalidUsernameException.class)
+                .hasMessage("Username can not be blank. Failed to resolve username using the attributes `sAMAccountName` and `uid`.");
     }
 }

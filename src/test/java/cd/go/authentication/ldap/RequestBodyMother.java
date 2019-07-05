@@ -64,6 +64,11 @@ public class RequestBodyMother {
         return gson.toJson(requestMap);
     }
 
+    public static String forValidateAuthConfig(String username, String password, String searchBase) {
+        Map<String, Object> requestMap = getRequestBodyMap(username, password, "ldap", searchBase);
+        return gson.toJson(requestMap);
+    }
+
     private static Map<String, Object> getRequestBodyMap(String username, String password, String authConfigId, String searchBase) {
         Map<String, Object> requestMap = new HashMap<>();
 

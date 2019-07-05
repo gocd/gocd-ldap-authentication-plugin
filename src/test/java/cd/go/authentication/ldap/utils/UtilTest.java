@@ -16,41 +16,38 @@
 
 package cd.go.authentication.ldap.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class UtilTest {
-
+class UtilTest {
     @Test
-    public void listFromCommaSeparatedString_shouldParseCommaSeparatedStringWithoutSpace() throws Exception {
+    void listFromCommaSeparatedString_shouldParseCommaSeparatedStringWithoutSpace() {
         String csvStringWithoutSpace = "uid,sAmAccountName,mail,displayName,name";
         List<String> resultOfWithoutSpace = Util.listFromCommaSeparatedString(csvStringWithoutSpace);
-        assertThat(resultOfWithoutSpace, hasSize(5));
-        assertThat(resultOfWithoutSpace, contains("uid", "sAmAccountName", "mail", "displayName", "name"));
+        assertThat(resultOfWithoutSpace).hasSize(5)
+                .contains("uid", "sAmAccountName", "mail", "displayName", "name");
     }
 
     @Test
-    public void listFromCommaSeparatedString_shouldParseCommaSeparatedStringWithSpace() throws Exception {
+    void listFromCommaSeparatedString_shouldParseCommaSeparatedStringWithSpace() {
         String csvStringWithoutSpace = "uid   ,    sAmAccountName        ,          mail ,         displayName       ,        name";
         List<String> resultOfWithoutSpace = Util.listFromCommaSeparatedString(csvStringWithoutSpace);
-        assertThat(resultOfWithoutSpace, hasSize(5));
-        assertThat(resultOfWithoutSpace, contains("uid", "sAmAccountName", "mail", "displayName", "name"));
+        assertThat(resultOfWithoutSpace).hasSize(5)
+                .contains("uid", "sAmAccountName", "mail", "displayName", "name");
     }
 
     @Test
-    public void listFromCommaSeparatedString_shouldParseCommaSeparatedStringWithNewLine() throws Exception {
+    void listFromCommaSeparatedString_shouldParseCommaSeparatedStringWithNewLine() {
         String csvStringWithoutSpace = "uid,\n" +
                 "sAmAccountName,\n" +
                 "mail,\n" +
                 "displayName,\n" +
                 "name";
         List<String> resultOfWithoutSpace = Util.listFromCommaSeparatedString(csvStringWithoutSpace);
-        assertThat(resultOfWithoutSpace, hasSize(5));
-        assertThat(resultOfWithoutSpace, contains("uid", "sAmAccountName", "mail", "displayName", "name"));
+        assertThat(resultOfWithoutSpace).hasSize(5)
+                .contains("uid", "sAmAccountName", "mail", "displayName", "name");
     }
 }

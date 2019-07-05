@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,27 @@
  * limitations under the License.
  */
 
-package cd.go.authentication.ldap.annotation;
+package cd.go.authentication.ldap.model;
 
-public interface Metadata {
-    boolean isRequired();
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-    boolean isSecure();
+import java.util.List;
 
-    FieldType getType();
+public class SearchUserRequest {
+    @Expose
+    @SerializedName("search_term")
+    private String searchTerm;
+
+    @Expose
+    @SerializedName("auth_configs")
+    private List<AuthConfig> authConfigs;
+
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
+    public List<AuthConfig> getAuthConfigs() {
+        return authConfigs;
+    }
 }

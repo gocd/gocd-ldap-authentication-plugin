@@ -22,19 +22,18 @@ import cd.go.authentication.ldap.model.*;
 import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
 import cd.go.framework.ldap.mapper.AbstractMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class LdapAuthenticatorTest {
+class LdapAuthenticatorTest {
 
     private AuthConfig authConfig;
     private LdapFactory ldapFactory;
@@ -43,8 +42,8 @@ public class LdapAuthenticatorTest {
     private Credentials credentials;
     private LdapAuthenticator ldapAuthenticator;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         authConfig = mock(AuthConfig.class);
         ldapFactory = mock(LdapFactory.class);
         ldapConfiguration = mock(LdapConfiguration.class);
@@ -60,14 +59,14 @@ public class LdapAuthenticatorTest {
 
 
     @Test
-    public void authenticate_shouldAuthenticateUserWithLdap() throws Exception {
+    void authenticate_shouldAuthenticateUserWithLdap() throws Exception {
         ldapAuthenticator.authenticate(credentials, Collections.singletonList(authConfig));
 
         verify(ldap).authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(AbstractMapper.class));
     }
 
     @Test
-    public void authenticate_shouldReturnAuthenticationResponseWithUserOnSuccessfulAuthentication() throws Exception {
+    void authenticate_shouldReturnAuthenticationResponseWithUserOnSuccessfulAuthentication() throws Exception {
         final UserMapper userMapper = mock(UserMapper.class);
         final User user = new User("jduke", "Java Duke", "jduke2example.com");
         Attributes attributes = new BasicAttributes();
@@ -78,11 +77,11 @@ public class LdapAuthenticatorTest {
 
         final AuthenticationResponse authenticationResponse = ldapAuthenticator.authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertThat(authenticationResponse.getUser(), is(user));
+        assertThat(authenticationResponse.getUser()).isEqualTo(user);
     }
 
     @Test
-    public void authenticate_shouldReturnAuthenticationResponseWithAuthConfigOnSuccessfulAuthentication() throws Exception {
+    void authenticate_shouldReturnAuthenticationResponseWithAuthConfigOnSuccessfulAuthentication() throws Exception {
         final UserMapper userMapper = mock(UserMapper.class);
         final AuthConfig validAuthConfig = mock(AuthConfig.class);
         final LdapConfiguration validLdapConfiguration = mock(LdapConfiguration.class);
@@ -96,21 +95,21 @@ public class LdapAuthenticatorTest {
 
         final AuthenticationResponse authenticationResponse = ldapAuthenticator.authenticate(credentials, Arrays.asList(this.authConfig, validAuthConfig));
 
-        assertThat(authenticationResponse.getConfigUsedForAuthentication(), is(validAuthConfig));
+        assertThat(authenticationResponse.getConfigUsedForAuthentication()).isEqualTo(validAuthConfig);
     }
 
     @Test
-    public void authenticate_shouldReturnAuthenticationResponseWithAuthConfigUsedForAuthenticationInCaseOfMultipleAuthConfigs() throws Exception {
+    void authenticate_shouldReturnAuthenticationResponseWithAuthConfigUsedForAuthenticationInCaseOfMultipleAuthConfigs() throws Exception {
         final UserMapper userMapper = mock(UserMapper.class);
         Attributes attributes = new BasicAttributes();
 
-        when(ldapConfiguration.getLdapUrl()).thenReturn("some-url");
+        when(ldapConfiguration.getLdapUrlAsString()).thenReturn("some-url");
         when(ldap.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(AbstractMapper.class))).thenReturn(attributes);
         when(ldapConfiguration.getUserMapper(new UsernameResolver(credentials.getUsername()))).thenReturn(userMapper);
         when(userMapper.mapFromResult(attributes)).thenReturn(mock(User.class));
 
         final AuthenticationResponse authenticationResponse = ldapAuthenticator.authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertThat(authenticationResponse.getConfigUsedForAuthentication(), is(authConfig));
+        assertThat(authenticationResponse.getConfigUsedForAuthentication()).isEqualTo(authConfig);
     }
 }

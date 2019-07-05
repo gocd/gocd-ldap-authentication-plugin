@@ -47,7 +47,7 @@ public class Ldap {
             List<SearchResult> results = search(dirContext, ldapConfiguration.getUserLoginFilter(), new String[]{username}, MAX_AUTHENTICATION_RESULT, true);
 
             if (results.isEmpty()) {
-                throw new RuntimeException(format("User {0} does not exist in {1}", username, ldapConfiguration.getLdapUrl()));
+                throw new RuntimeException(format("User {0} does not exist in {1}", username, ldapConfiguration.getLdapUrlAsString()));
             }
 
             SearchResult searchResult = results.get(0);

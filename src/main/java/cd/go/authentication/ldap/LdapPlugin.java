@@ -17,13 +17,16 @@
 package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.executor.*;
+import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.utils.Util;
+import cd.go.authentication.ldap.validators.ManagerCredentialValidator;
+import cd.go.plugin.base.dispatcher.BaseBuilder;
+import cd.go.plugin.base.dispatcher.RequestDispatcher;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.annotation.Extension;
 import com.thoughtworks.go.plugin.api.annotation.Load;
-import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.info.PluginContext;
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
@@ -31,17 +34,27 @@ import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import static cd.go.authentication.ldap.Constants.PLUGIN_IDENTIFIER;
+import static cd.go.plugin.base.dispatcher.authorization.SupportedAuthType.Password;
 import static com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse.INTERNAL_ERROR;
 
 @Extension
 public class LdapPlugin implements GoPlugin {
     public static final Logger LOG = Logger.getLoggerFor(LdapPlugin.class);
-
-    private GoApplicationAccessor accessor;
+    private RequestDispatcher requestDispatcher;
 
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor accessor) {
-        this.accessor = accessor;
+        requestDispatcher = BaseBuilder.forAuthorization().v2()
+                .icon("/gocd_72_72_icon.png", "image/png")
+                .capabilities(Password, true, false, false)
+                .authConfigMetadata(LdapConfiguration.class)
+                .authConfigView("/auth_config.template.html")
+                .verifyConnection(new VerifyConnectionRequestExecutor())
+                .validateAuthConfig(new ManagerCredentialValidator())
+                .authenticateUser(new UserAuthenticationExecutor())
+                .searchUser(new SearchUserExecutor())
+                .isValidUser(new IsValidUserRequestExecutor())
+                .build();
     }
 
     @Load
@@ -50,30 +63,9 @@ public class LdapPlugin implements GoPlugin {
     }
 
     @Override
-    public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
+    public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
-            switch (RequestFromServer.fromString(request.requestName())) {
-                case REQUEST_GET_PLUGIN_ICON:
-                    return new GetPluginIconExecutor().execute();
-                case REQUEST_GET_CAPABILITIES:
-                    return new GetCapabilitiesExecutor().execute();
-                case REQUEST_GET_AUTH_CONFIG_METADATA:
-                    return new GetAuthConfigMetadataExecutor().execute();
-                case REQUEST_AUTH_CONFIG_VIEW:
-                    return new GetAuthConfigViewExecutor().execute();
-                case REQUEST_VALIDATE_AUTH_CONFIG:
-                    return new AuthConfigValidateRequestExecutor(request).execute();
-                case REQUEST_VERIFY_CONNECTION:
-                    return new VerifyConnectionRequestExecutor(request).execute();
-                case REQUEST_AUTHENTICATE_USER:
-                    return new UserAuthenticationExecutor(request, new LdapAuthenticator()).execute();
-                case REQUEST_SEARCH_USERS:
-                    return new SearchUserExecutor(request).execute();
-                case REQUEST_IS_VALID_USER:
-                    return new IsValidUserRequestExecutor(request).execute();
-                default:
-                    throw new UnhandledRequestTypeException(request.requestName());
-            }
+            return requestDispatcher.dispatch(request);
         } catch (NoSuchRequestHandler e) {
             LOG.warn(e.getMessage());
             return new DefaultGoPluginApiResponse(INTERNAL_ERROR, e.getMessage());

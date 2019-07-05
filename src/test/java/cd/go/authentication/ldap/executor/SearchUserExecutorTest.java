@@ -24,8 +24,8 @@ import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -33,19 +33,18 @@ import java.util.Arrays;
 
 import static cd.go.authentication.ldap.RequestBodyMother.forSearchWithMultipleAuthConfigs;
 import static cd.go.authentication.ldap.RequestBodyMother.forSearchWithSearchFilter;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class SearchUserExecutorTest {
+class SearchUserExecutorTest {
 
     private GoPluginApiRequest request;
     private LdapFactory ldapFactory;
     private Ldap ldap;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         request = mock(GoPluginApiRequest.class);
         ldapFactory = mock(LdapFactory.class);
         ldap = mock(Ldap.class);
@@ -54,43 +53,43 @@ public class SearchUserExecutorTest {
     }
 
     @Test
-    public void shouldSearchUsersUsingDefaultFilter() throws Exception {
+    void shouldSearchUsersUsingDefaultFilter() throws Exception {
         final String searchRequestBody = RequestBodyMother.forSearch("some-text");
 
         when(request.requestBody()).thenReturn(searchRequestBody);
 
-        new SearchUserExecutor(request, ldapFactory).execute();
+        new SearchUserExecutor(ldapFactory).execute(request);
 
         ArgumentCaptor<String> filterArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
         verify(ldap).search(filterArgumentCaptor.capture(), eq(new String[]{"some-text"}), any(UserMapper.class), eq(100));
 
         final String expectedFilter = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";
-        assertThat(filterArgumentCaptor.getValue(), is(expectedFilter));
+        assertThat(filterArgumentCaptor.getValue()).isEqualTo(expectedFilter);
     }
 
     @Test
-    public void shouldSearchUserUsingTheAuthConfigSearchFilter() throws Exception {
+    void shouldSearchUserUsingTheAuthConfigSearchFilter() throws Exception {
         final String searchRequestBody = forSearchWithSearchFilter("some-text", "(cn={0})");
         when(request.requestBody()).thenReturn(searchRequestBody);
 
-        new SearchUserExecutor(request, ldapFactory).execute();
+        new SearchUserExecutor(ldapFactory).execute(request);
 
         ArgumentCaptor<String> filterArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(ldap).search(filterArgumentCaptor.capture(), eq(new String[]{"some-text"}), any(UserMapper.class), eq(100));
 
-        assertThat(filterArgumentCaptor.getValue(), is("(cn={0})"));
+        assertThat(filterArgumentCaptor.getValue()).isEqualTo("(cn={0})");
     }
 
     @Test
-    public void shouldListUsersMatchingTheSearchTerm() throws Exception {
+    void shouldListUsersMatchingTheSearchTerm() throws Exception {
         final String searchRequestBody = forSearchWithSearchFilter("some-text", "(cn={0})");
         when(request.requestBody()).thenReturn(searchRequestBody);
 
         final User user = new User("username", "displayName", "mail");
         when(ldap.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenReturn(Arrays.asList(user));
 
-        final GoPluginApiResponse response = new SearchUserExecutor(request, ldapFactory).execute();
+        final GoPluginApiResponse response = new SearchUserExecutor(ldapFactory).execute(request);
 
         String expectedJSON = "[\n" +
                 "  {\n" +
@@ -100,12 +99,12 @@ public class SearchUserExecutorTest {
                 "  }\n" +
                 "]";
 
-        assertThat(response.responseCode(), is(200));
+        assertThat(response.responseCode()).isEqualTo(200);
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
     }
 
     @Test
-    public void shouldSearchUsersAgainstMultipleLdapServers() throws Exception {
+    void shouldSearchUsersAgainstMultipleLdapServers() throws Exception {
         final String searchRequestBody = forSearchWithMultipleAuthConfigs("some-text");
         when(request.requestBody()).thenReturn(searchRequestBody);
 
@@ -114,7 +113,7 @@ public class SearchUserExecutorTest {
 
         when(ldap.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenReturn(Arrays.asList(userFromAuthConfig1)).thenReturn(Arrays.asList(userFromAuthConfig2));
 
-        final GoPluginApiResponse response = new SearchUserExecutor(request, ldapFactory).execute();
+        final GoPluginApiResponse response = new SearchUserExecutor(ldapFactory).execute(request);
 
         String expectedJSON = "[\n" +
                 "  {\n" +
@@ -129,12 +128,12 @@ public class SearchUserExecutorTest {
                 "  }\n" +
                 "]";
 
-        assertThat(response.responseCode(), is(200));
+        assertThat(response.responseCode()).isEqualTo(200);
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
     }
 
     @Test
-    public void shouldHandleSearchFailureWhenSearchAgainstMultipleLdapServers() throws Exception {
+    void shouldHandleSearchFailureWhenSearchAgainstMultipleLdapServers() throws Exception {
         final String searchRequestBody = forSearchWithMultipleAuthConfigs("some-text");
         when(request.requestBody()).thenReturn(searchRequestBody);
 
@@ -142,7 +141,7 @@ public class SearchUserExecutorTest {
 
         when(ldap.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenThrow(new RuntimeException()).thenReturn(Arrays.asList(userFromAuthConfig2));
 
-        final GoPluginApiResponse response = new SearchUserExecutor(request, ldapFactory).execute();
+        final GoPluginApiResponse response = new SearchUserExecutor(ldapFactory).execute(request);
 
         String expectedJSON = "[\n" +
                 "  {\n" +
@@ -152,7 +151,7 @@ public class SearchUserExecutorTest {
                 "  }\n" +
                 "]";
 
-        assertThat(response.responseCode(), is(200));
+        assertThat(response.responseCode()).isEqualTo(200);
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
     }
 }

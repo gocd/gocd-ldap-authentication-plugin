@@ -31,8 +31,8 @@ import javax.naming.directory.DirContext;
 import java.util.List;
 
 import static java.text.MessageFormat.format;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -48,8 +48,8 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         final User user = ldapSpy.authenticate("bford", "bob", ldapConfiguration.getUserMapper(new UsernameResolver()));
 
-        assertNotNull(user);
-        assertThat(user, is(new User("bford", "Bob Ford", "bford@example.com")));
+        assertThat(user).isNotNull();
+        assertThat(user).isEqualTo(new User("bford", "Bob Ford", "bford@example.com"));
 
         verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
     }
@@ -75,7 +75,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
 
         thrown.expect(RuntimeException.class);
-        thrown.expectMessage(format("User foo does not exist in {0}", ldapConfiguration.getLdapUrl()));
+        thrown.expectMessage(format("User foo does not exist in {0}", ldapConfiguration.getLdapUrlAsString()));
 
         ldapSpy.authenticate("foo", "bar", ldapConfiguration.getUserMapper(new UsernameResolver()));
 
@@ -101,8 +101,8 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"pbanks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 1);
 
-        assertThat(users, hasSize(1));
-        assertThat(users.get(0), is(new User("pbanks", "P.Banks", "pbanks@example.com")));
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0)).isEqualTo(new User("pbanks", "P.Banks", "pbanks@example.com"));
         verify(ldapSpy).closeContextSilently(any(DirContext.class));
     }
 
@@ -114,8 +114,8 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"banks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 2);
 
-        assertThat(users, hasSize(2));
-        assertThat(users, containsInAnyOrder(new User("pbanks", "P.Banks", "pbanks@example.com"), new User("sbanks", "S.Banks", "sbanks@example.com")));
+        assertThat(users).hasSize(2);
+        assertThat(users).contains(new User("pbanks", "P.Banks", "pbanks@example.com"), new User("sbanks", "S.Banks", "sbanks@example.com"));
         verify(ldapSpy).closeContextSilently(any(DirContext.class));
     }
 
@@ -129,11 +129,11 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
-        assertThat(allUsers, hasSize(5));
+        assertThat(allUsers).hasSize(5);
 
         final List<User> userFoundFromFirstSearchBase = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
 
-        assertThat(userFoundFromFirstSearchBase, hasSize(3));
+        assertThat(userFoundFromFirstSearchBase).hasSize(3);
         verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
     }
 
@@ -146,11 +146,11 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
 
         final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
-        assertThat(allUsers, hasSize(5));
+        assertThat(allUsers).hasSize(5);
 
         final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 4);
 
-        assertThat(users, hasSize(4));
+        assertThat(users).hasSize(4);
         verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
     }
 

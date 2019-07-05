@@ -1,0 +1,74 @@
+[
+  {
+    "key": "Url",
+    "metadata": {
+      "displayName": "",
+      "required": true,
+      "secure": false
+    }
+  },
+  {
+    "key": "SearchBases",
+    "metadata": {
+      "displayName": "",
+      "required": true,
+      "secure": false
+    }
+  },
+  {
+    "key": "ManagerDN",
+    "metadata": {
+      "displayName": "",
+      "required": false,
+      "secure": false
+    }
+  },
+  {
+    "key": "Password",
+    "metadata": {
+      "displayName": "",
+      "required": false,
+      "secure": true
+    }
+  },
+  {
+    "key": "UserSearchFilter",
+    "metadata": {
+      "displayName": "",
+      "required": false,
+      "secure": false
+    }
+  },
+  {
+    "key": "UserLoginFilter",
+    "metadata": {
+      "displayName": "",
+      "required": true,
+      "secure": false
+    }
+  },
+  {
+    "key": "DisplayNameAttribute",
+    "metadata": {
+      "displayName": "",
+      "required": false,
+      "secure": false
+    }
+  },
+  {
+    "key": "EmailAttribute",
+    "metadata": {
+      "displayName": "",
+      "required": false,
+      "secure": false
+    }
+  },
+  {
+    "key": "SearchTimeout",
+    "metadata": {
+      "displayName": "",
+      "required": false,
+      "secure": false
+    }
+  }
+]

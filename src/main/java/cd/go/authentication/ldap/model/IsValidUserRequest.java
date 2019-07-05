@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package cd.go.authentication.ldap.annotation;
+package cd.go.authentication.ldap.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ProfileField {
-    String key();
+public class IsValidUserRequest {
+    @Expose
+    @SerializedName("username")
+    private String username;
 
-    boolean required();
+    @Expose
+    @SerializedName("auth_config")
+    private AuthConfig authConfig;
 
-    boolean secure();
+    public String getUsername() {
+        return username;
+    }
 
-    FieldType type() default FieldType.STRING;
+    public AuthConfig getAuthConfig() {
+        return authConfig;
+    }
 }

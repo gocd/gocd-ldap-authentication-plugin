@@ -1,0 +1,9 @@
+{
+  "Url": "ldap://localhost:10389",
+  "SearchBases": "ou=users,ou=system",
+  "ManagerDN": "uid=admin,ou=system",
+  "Password": "secret",
+  "UserSearchFilter": "(cn={0})",
+  "UserLoginFilter": "uid",
+  "DisplayNameAttribute": "displayName"
+}

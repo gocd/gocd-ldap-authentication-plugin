@@ -17,37 +17,33 @@
 package cd.go.authentication.ldap.executor;
 
 import cd.go.authentication.ldap.LdapAuthenticator;
-import cd.go.authentication.ldap.model.AuthConfig;
+import cd.go.authentication.ldap.model.AuthenticationRequest;
 import cd.go.authentication.ldap.model.AuthenticationResponse;
-import cd.go.authentication.ldap.model.Credentials;
-import com.google.gson.Gson;
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import cd.go.plugin.base.GsonTransformer;
+import cd.go.plugin.base.executors.AbstractExecutor;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse.SUCCESS_RESPONSE_CODE;
 
-public class UserAuthenticationExecutor implements RequestExecutor {
-    private static final Gson GSON = new Gson();
-    private final GoPluginApiRequest request;
+public class UserAuthenticationExecutor extends AbstractExecutor<AuthenticationRequest> {
     private final LdapAuthenticator authenticator;
 
-    public UserAuthenticationExecutor(GoPluginApiRequest request, LdapAuthenticator authenticator) {
-        this.request = request;
+    public UserAuthenticationExecutor() {
+        this(new LdapAuthenticator());
+    }
+
+    UserAuthenticationExecutor(LdapAuthenticator authenticator) {
         this.authenticator = authenticator;
     }
 
     @Override
-    public GoPluginApiResponse execute() throws Exception {
-        Credentials credentials = Credentials.fromJSON(request.requestBody());
-        final List<AuthConfig> authConfigs = AuthConfig.fromJSONList(request.requestBody());
-
-        AuthenticationResponse authenticationResponse = authenticator.authenticate(credentials, authConfigs);
+    protected GoPluginApiResponse execute(AuthenticationRequest request) {
+        AuthenticationResponse authenticationResponse = authenticator.authenticate(request.getCredentials(), request.getAuthConfigs());
 
         Map<String, Object> userMap = new HashMap<>();
         if (authenticationResponse != null) {
@@ -55,8 +51,11 @@ public class UserAuthenticationExecutor implements RequestExecutor {
             userMap.put("roles", Collections.emptyList());
         }
 
-        DefaultGoPluginApiResponse response = new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, GSON.toJson(userMap));
-        return response;
+        return new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, GsonTransformer.toJson(userMap));
     }
 
+    @Override
+    protected AuthenticationRequest parseRequest(String requestBody) {
+        return GsonTransformer.fromJson(requestBody, AuthenticationRequest.class);
+    }
 }

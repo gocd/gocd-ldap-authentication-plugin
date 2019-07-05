@@ -62,7 +62,7 @@ public class LdapAuthenticator {
                 return new AuthenticationResponse(user, authConfig);
             }
         } catch (Exception e) {
-            LOG.info("[Authenticate] Failed to authenticate user " + credentials.getUsername() + " on " + configuration.getLdapUrl() + ". ");
+            LOG.info("[Authenticate] Failed to authenticate user " + credentials.getUsername() + " on " + configuration.getLdapUrlAsString() + ". ");
             LOG.debug("Exception: ", e);
         }
         return null;

@@ -21,64 +21,65 @@ import cd.go.framework.ldap.Ldap;
 import cd.go.framework.ldap.LdapFactory;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
-import org.junit.Test;
+import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.naming.NamingException;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-public class VerifyConnectionRequestExecutorTest {
+class VerifyConnectionRequestExecutorTest {
     private LdapFactory ldapFactory;
     private Ldap ldap;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         ldapFactory = mock(LdapFactory.class);
         ldap = mock(Ldap.class);
     }
 
     @Test
-    public void execute_shouldValidateTheConfiguration() throws Exception {
+    void execute_shouldValidateTheConfiguration() throws JSONException {
         DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(null, null, null);
         request.setRequestBody(inVaildConfig());
 
-        GoPluginApiResponse response = new VerifyConnectionRequestExecutor(request).execute();
+        GoPluginApiResponse response = new VerifyConnectionRequestExecutor().execute(request);
 
         String expectedResponse = "{\"message\":\"Validation failed for the given Auth Config\",\"errors\":[{\"message\":\"UserLoginFilter must not be blank.\",\"key\":\"UserLoginFilter\"}],\"status\":\"validation-failed\"}";
 
-        assertThat(response.responseBody(), is(expectedResponse));
+        assertEquals(expectedResponse, response.responseBody(), true);
     }
 
     @Test
-    public void execute_shouldVerifyConnectionForAValidConfiguration() throws Exception {
+    void execute_shouldVerifyConnectionForAValidConfiguration() throws Exception {
         DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(null, null, null);
         request.setRequestBody(vaildConfig());
 
         when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldap);
         doThrow(new NamingException("Cannot verify connection")).when(ldap).validate();
 
-        GoPluginApiResponse response = new VerifyConnectionRequestExecutor(request, ldapFactory).execute();
+        GoPluginApiResponse response = new VerifyConnectionRequestExecutor(ldapFactory).execute(request);
 
         String expectedResponse = "{\"message\":\"Cannot verify connection\",\"status\":\"failure\"}";
-        assertThat(response.responseBody(), is(expectedResponse));
+        assertThat(response.responseBody()).isEqualTo(expectedResponse);
     }
 
     @Test
-    public void execute_shouldVerifyConnection() throws Exception {
+    void execute_shouldVerifyConnection() throws Exception {
         DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(null, null, null);
         request.setRequestBody(vaildConfig());
 
         when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldap);
         doNothing().when(ldap).validate();
 
-        GoPluginApiResponse response = new VerifyConnectionRequestExecutor(request, ldapFactory).execute();
+        GoPluginApiResponse response = new VerifyConnectionRequestExecutor(ldapFactory).execute(request);
 
         String expectedResponse = "{\"message\":\"Connection ok\",\"status\":\"success\"}";
-        assertThat(response.responseBody(), is(expectedResponse));
+        assertThat(response.responseBody()).isEqualTo(expectedResponse);
     }
 
     private String vaildConfig() {

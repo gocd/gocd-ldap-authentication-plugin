@@ -16,17 +16,14 @@
 
 package cd.go.authentication.ldap.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class LdapConfigurationTest {
+class LdapConfigurationTest {
 
     @Test
-    public void shouldAbleToDeserializeToLdapProfile() throws Exception {
+    void shouldAbleToDeserializeToLdapProfile() {
         String json = "{\n" +
                 "  \"ManagerDN\": \"uid=admin,ou=system\",\n" +
                 "  \"DisplayNameAttribute\": \"displayName\",\n" +
@@ -40,14 +37,14 @@ public class LdapConfigurationTest {
 
         LdapConfiguration ldapConfiguration = LdapConfiguration.fromJSON(json);
 
-        assertNotNull(ldapConfiguration);
-        assertThat(ldapConfiguration.getLdapUrl(), is("ldap://localhost:10389"));
-        assertThat(ldapConfiguration.getSearchBases(), contains("ou=users,ou=system", "ou=employee,ou=system"));
-        assertThat(ldapConfiguration.getManagerDn(), is("uid=admin,ou=system"));
-        assertThat(ldapConfiguration.getPassword(), is("secret"));
-        assertThat(ldapConfiguration.getUserLoginFilter(), is("uid"));
-        assertThat(ldapConfiguration.getDisplayNameAttribute(), is("displayName"));
-        assertThat(ldapConfiguration.getEmailAttribute(), is("mail"));
-        assertThat(ldapConfiguration.getUserSearchFilter(), is("(cn={0})"));
+        assertThat(ldapConfiguration).isNotNull();
+        assertThat(ldapConfiguration.getLdapUrlAsString()).isEqualTo("ldap://localhost:10389");
+        assertThat(ldapConfiguration.getSearchBases()).containsExactly("ou=users,ou=system", "ou=employee,ou=system");
+        assertThat(ldapConfiguration.getManagerDn()).isEqualTo("uid=admin,ou=system");
+        assertThat(ldapConfiguration.getPassword()).isEqualTo("secret");
+        assertThat(ldapConfiguration.getUserLoginFilter()).isEqualTo("uid");
+        assertThat(ldapConfiguration.getDisplayNameAttribute()).isEqualTo("displayName");
+        assertThat(ldapConfiguration.getEmailAttribute()).isEqualTo("mail");
+        assertThat(ldapConfiguration.getUserSearchFilter()).isEqualTo("(cn={0})");
     }
 }
