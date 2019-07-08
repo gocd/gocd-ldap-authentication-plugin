@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,12 @@ import cd.go.plugin.base.annotations.Property;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.directory.api.ldap.model.url.LdapUrl;
 
 import java.util.List;
 import java.util.Objects;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static cd.go.authentication.ldap.utils.Util.GSON;
 import static cd.go.authentication.ldap.utils.Util.isBlank;
 
@@ -86,18 +88,18 @@ public class LdapConfiguration {
         return ldapUrl;
     }
 
-//    public LdapUrl getLdapUrl() {
-//        try {
-//            return new LdapUrl(ldapUrl);
-//        } catch (Exception e) {
-//            LOG.error("Error while parsing url", e);
-//        }
-//        return null;
-//    }
-//
-//    public boolean useSSL() {
-//        return LdapUrl.LDAPS_SCHEME.equalsIgnoreCase(getLdapUrl().getScheme());
-//    }
+    public LdapUrl getLdapUrl() {
+        try {
+            return new LdapUrl(ldapUrl);
+        } catch (Exception e) {
+            LOG.error("Error while parsing url", e);
+        }
+        return null;
+    }
+
+    public boolean useSSL() {
+        return LdapUrl.LDAPS_SCHEME.equalsIgnoreCase(getLdapUrl().getScheme());
+    }
 
     public List<String> getSearchBases() {
         return Util.splitIntoLinesAndTrimSpaces(searchBases);

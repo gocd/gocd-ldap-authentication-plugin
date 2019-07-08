@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package cd.go.framework.ldap.mapper;
+package cd.go.apacheds;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
 
-public abstract class AbstractMapper<T> {
-    public abstract T mapFromResult(Attributes attributes) throws NamingException;
+import cd.go.authentication.ldap.model.LdapConfiguration;
+
+public class LdapFactory {
+    public Ldap ldapForConfiguration(LdapConfiguration configuration) {
+        return new Ldap(configuration);
+    }
 }
