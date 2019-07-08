@@ -17,10 +17,10 @@
 package cd.go.authentication.ldap.executor;
 
 import cd.go.authentication.ldap.BaseIntegrationTest;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.IsValidUserRequest;
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import cd.go.framework.ldap.LdapFactory;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;

@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package cd.go.apacheds;
+package cd.go.authentication.ldap.mapper;
 
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.ldap.client.template.EntryMapper;
 
-import cd.go.authentication.ldap.model.LdapConfiguration;
-
-public class LdapFactory {
-    public Ldap ldapForConfiguration(LdapConfiguration configuration) {
-        return new Ldap(configuration);
+public interface Mapper<T> extends EntryMapper {
+    default T map(Entry entry) {
+        return mapObject(new ResultWrapper(entry));
     }
+
+    T mapObject(ResultWrapper resultWrapper);
 }

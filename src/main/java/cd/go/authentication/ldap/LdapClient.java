@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package cd.go.framework.ldap.mapper;
+package cd.go.authentication.ldap;
+
+import cd.go.authentication.ldap.mapper.Mapper;
 
 import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
+import java.util.List;
 
-public abstract class AbstractMapper<T> {
-    public abstract T mapFromResult(Attributes attributes) throws NamingException;
+public interface LdapClient {
+    <T> T authenticate(String username, String password, Mapper<T> mapper);
+
+    <T> List<T> search(String userSearchFilter, Object[] filterArgs, Mapper<T> mapper, int maxResult);
+
+    void validate() throws NamingException;
 }

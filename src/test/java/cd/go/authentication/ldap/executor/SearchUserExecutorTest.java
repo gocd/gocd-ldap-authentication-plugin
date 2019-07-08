@@ -16,12 +16,12 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.RequestBodyMother;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
 import cd.go.framework.ldap.Ldap;
-import cd.go.framework.ldap.LdapFactory;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.jupiter.api.BeforeEach;

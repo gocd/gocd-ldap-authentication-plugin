@@ -35,7 +35,6 @@ import java.util.Map;
         @CreateTransport(protocol = "LDAP")
 })
 public abstract class BaseIntegrationTest extends AbstractLdapTestUnit {
-
     protected LdapConfiguration ldapConfiguration(String[] searchBases) {
         Map<String, String> configuration = configAsMap("uid=admin,ou=system", "secret", "(uid={0})", searchBases
         );

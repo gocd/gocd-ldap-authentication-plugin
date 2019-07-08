@@ -41,7 +41,7 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void shouldAuthenticateAgainstMultipleSearchBases() throws Exception {
+    public void shouldAuthenticateAgainstMultipleSearchBases() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
 
         AuthConfig authConfig = new AuthConfig("auth_config", ldapConfiguration);
@@ -53,11 +53,10 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.getUser()).isEqualTo(new User("sbanks", "S.Banks", "sbanks@example.com"));
         assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfig);
-        assertThat(response.getUser().getAttributes().get("dn").get().toString()).endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system");
     }
 
     @Test
-    public void shouldAuthenticateAgainstMultipleAuthConfig() throws Exception {
+    public void shouldAuthenticateAgainstMultipleAuthConfig() {
         AuthConfig authConfigForEmployees = new AuthConfig("auth_config_employees", ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"}));
         AuthConfig authConfigForClients = new AuthConfig("auth_config_clients", ldapConfiguration(new String[]{"ou=Clients,ou=Enterprise,ou=Principal,ou=system"}));
 
@@ -68,7 +67,6 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.getUser()).isEqualTo(new User("sbanks", "S.Banks", "sbanks@example.com"));
         assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfigForClients);
-        assertThat(response.getUser().getAttributes().get("dn").get().toString()).endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system");
     }
 
     @Test

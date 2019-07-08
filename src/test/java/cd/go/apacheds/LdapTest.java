@@ -146,7 +146,7 @@ class LdapTest {
                 .thenReturn(Collections.singletonList(new DefaultEntry()));
 
 
-        final List<Entry> entries = ldap.searchGroup(Arrays.asList("ou=foo,dc=bar", "ou=baz,dc=bar"), "(member=admin)", entry -> entry);
+        final List<Entry> entries = ldap.searchGroup(Arrays.asList("ou=foo,dc=bar", "ou=baz,dc=bar"), "(member=admin)", resultWrapper -> (Entry) resultWrapper.getResult());
 
         final List<SearchRequest> searchRequests = argumentCaptor.getAllValues();
 
@@ -163,7 +163,7 @@ class LdapTest {
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
         final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
 
-        ldap.verifyConnection();
+        ldap.validate();
 
         verify(ldapConnectionTemplate).searchFirst(
                 eq("ou=foo,dc=bar"),

@@ -16,8 +16,12 @@
 
 package cd.go.framework.ldap;
 
+import cd.go.authentication.ldap.LdapClient;
+import cd.go.authentication.ldap.exception.LdapException;
+import cd.go.authentication.ldap.exception.MultipleUserDetectedException;
+import cd.go.authentication.ldap.mapper.Mapper;
+import cd.go.authentication.ldap.mapper.ResultWrapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import cd.go.framework.ldap.mapper.AbstractMapper;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -32,7 +36,7 @@ import static java.text.MessageFormat.format;
 import static javax.naming.Context.SECURITY_CREDENTIALS;
 import static javax.naming.Context.SECURITY_PRINCIPAL;
 
-public class Ldap {
+public class Ldap implements LdapClient {
     private LdapConfiguration ldapConfiguration;
     private final int MAX_AUTHENTICATION_RESULT = 1;
 
@@ -40,7 +44,8 @@ public class Ldap {
         this.ldapConfiguration = ldapConfiguration;
     }
 
-    public <T> T authenticate(String username, String password, AbstractMapper<T> mapper) throws NamingException {
+    @Override
+    public <T> T authenticate(String username, String password, Mapper<T> mapper) {
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
 
         try {
@@ -55,25 +60,18 @@ public class Ldap {
             String userDn = searchResult.getNameInNamespace();
             attributes.put(new BasicAttribute("dn", userDn));
             authenticate(ldapConfiguration, userDn, password);
-            return mapper.mapFromResult(attributes);
+            return mapper.mapObject(new ResultWrapper(attributes));
 
         } catch (SearchResultLimitExceededException e) {
-            throw new RuntimeException(foundMultipleUserForAuthenticationErrorMessage(username, e));
+            throw new MultipleUserDetectedException(username, e.getSearchBase(), ldapConfiguration.getUserLoginFilter());
+        } catch (NamingException e) {
+            throw new LdapException(e);
         } finally {
             closeContextSilently(dirContext);
         }
     }
 
-    private String foundMultipleUserForAuthenticationErrorMessage(String username, SearchResultLimitExceededException e) {
-        StringBuilder messageBuilder = new StringBuilder()
-                .append(format("Found multiple users in search base `{0}` with username `{1}`. ", e.getSearchBase(), username));
-        if (ldapConfiguration.getUserLoginFilter().contains("*")) {
-            messageBuilder.append("It is not recommended to have wildcard(`*{0}*`, `{0}*` or `*{0}`) in `UserLoginFilter` field as it can match other users.");
-        }
-        return messageBuilder.toString();
-    }
-
-    public <T> List<T> search(String filter, Object[] filterArgs, AbstractMapper<T> mapper, int maxResult) throws NamingException {
+    public <T> List<T> search(String filter, Object[] filterArgs, Mapper<T> mapper, int maxResult) {
         List<T> results = new ArrayList<>();
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
 
@@ -81,8 +79,10 @@ public class Ldap {
             List<SearchResult> searchResults = search(dirContext, filter, filterArgs, maxResult, false);
 
             for (SearchResult result : searchResults) {
-                results.add(mapper.mapFromResult(result.getAttributes()));
+                results.add(mapper.mapObject(new ResultWrapper(result.getAttributes())));
             }
+        } catch (NamingException e) {
+            throw new LdapException(e);
         } finally {
             closeContextSilently(dirContext);
         }
@@ -90,7 +90,7 @@ public class Ldap {
         return results;
     }
 
-    private final DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) throws NamingException {
+    private final DirContext getDirContext(LdapConfiguration ldapConfiguration, String username, String password) {
         Hashtable<String, Object> environments = new Environment(ldapConfiguration).getEnvironments();
         if (isNotBlank(username)) {
             environments.put(SECURITY_PRINCIPAL, username);
@@ -103,7 +103,7 @@ public class Ldap {
             context = new InitialDirContext(environments);
         } catch (NamingException e) {
             closeContextSilently(context);
-            throw e;
+            throw new LdapException(e);
         }
 
         return context;

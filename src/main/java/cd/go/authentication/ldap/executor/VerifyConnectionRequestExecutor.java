@@ -16,9 +16,9 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapClient;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import cd.go.framework.ldap.Ldap;
-import cd.go.framework.ldap.LdapFactory;
 import cd.go.plugin.base.executors.AbstractExecutor;
 import cd.go.plugin.base.validation.DefaultValidator;
 import cd.go.plugin.base.validation.ValidationResult;
@@ -78,7 +78,7 @@ public class VerifyConnectionRequestExecutor extends AbstractExecutor<Map<String
 
     private String verifyConnection(LdapConfiguration ldapConfiguration) {
         try {
-            Ldap ldap = ldapFactory.ldapForConfiguration(ldapConfiguration);
+            LdapClient ldap = ldapFactory.ldapForConfiguration(ldapConfiguration);
             ldap.validate();
         } catch (NamingException e) {
             LOG.error("[Verify Connection] Verify connection failed with errors.", e);

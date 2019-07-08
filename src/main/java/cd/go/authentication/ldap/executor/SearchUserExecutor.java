@@ -16,13 +16,14 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapClient;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.SearchUserRequest;
 import cd.go.authentication.ldap.model.User;
 import cd.go.framework.ldap.Ldap;
-import cd.go.framework.ldap.LdapFactory;
 import cd.go.plugin.base.GsonTransformer;
 import cd.go.plugin.base.executors.AbstractExecutor;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -64,7 +65,7 @@ public class SearchUserExecutor extends AbstractExecutor<SearchUserRequest> {
             final int remainingResultCount = MAX_SEARCH_RESULT - allUsers.size();
             try {
                 final LdapConfiguration configuration = authConfig.getConfiguration();
-                final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
+                final LdapClient ldap = ldapFactory.ldapForConfiguration(configuration);
                 String userSearchFilter = configuration.getUserSearchFilter();
 
                 LOG.info(String.format("[User Search] Looking up for users matching search_term: `%s`" +

@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package cd.go.framework.ldap;
+package cd.go.authentication.ldap.mapper;
 
-import cd.go.authentication.ldap.model.LdapConfiguration;
+import org.apache.directory.api.ldap.model.entry.Entry;
 
-public class LdapFactory {
-    public Ldap ldapForConfiguration(LdapConfiguration configuration) {
-        return new Ldap(configuration);
+public class LdapMapperFactory {
+    public static final String LDAP_USE_JNDI_CLIENT = "ldap.use.jndi.client";
+
+    public Mapper attributeOrEntryMapper() {
+        if (useJndiClient()) {
+            return new AttributesMapper();
+        }
+        return (Mapper<Entry>) resultWrapper -> (Entry) resultWrapper.getResult();
+    }
+
+    private boolean useJndiClient() {
+        return Boolean.parseBoolean(System.getProperty(LDAP_USE_JNDI_CLIENT));
     }
 }

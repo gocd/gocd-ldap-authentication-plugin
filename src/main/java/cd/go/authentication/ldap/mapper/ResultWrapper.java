@@ -16,12 +16,29 @@
 
 package cd.go.authentication.ldap.mapper;
 
-import javax.naming.directory.Attributes;
+import java.util.Objects;
 
-public class AttributesMapper implements Mapper<Attributes> {
+public class ResultWrapper {
+    private Object result;
+
+    public ResultWrapper(Object attributes) {
+        this.result = attributes;
+    }
+
+    public Object getResult() {
+        return result;
+    }
 
     @Override
-    public Attributes mapObject(ResultWrapper resultWrapper) {
-        return (Attributes) resultWrapper.getResult();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ResultWrapper that = (ResultWrapper) o;
+        return Objects.equals(result, that.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(result);
     }
 }

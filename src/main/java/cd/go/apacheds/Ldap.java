@@ -16,6 +16,9 @@
 
 package cd.go.apacheds;
 
+import cd.go.authentication.ldap.LdapClient;
+import cd.go.authentication.ldap.exception.MultipleUserDetectedException;
+import cd.go.authentication.ldap.mapper.Mapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import org.apache.directory.api.ldap.codec.api.LdapApiService;
 import org.apache.directory.api.ldap.codec.api.LdapApiServiceFactory;
@@ -27,7 +30,6 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.ldap.client.template.AbstractPasswordPolicyResponder;
-import org.apache.directory.ldap.client.template.EntryMapper;
 import org.apache.directory.ldap.client.template.LdapConnectionTemplate;
 import org.apache.directory.ldap.client.template.PasswordWarning;
 import org.apache.directory.ldap.client.template.exception.PasswordException;
@@ -40,7 +42,7 @@ import static cd.go.apacheds.pool.ConnectionPoolFactory.getLdapConnectionPool;
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static java.text.MessageFormat.format;
 
-public class Ldap {
+public class Ldap implements LdapClient {
     private final LdapConnectionTemplate ldapConnectionTemplate;
     private final LdapConfiguration ldapConfiguration;
     private ConnectionConfiguration connectionConfiguration;
@@ -56,11 +58,11 @@ public class Ldap {
         this.ldapConnectionTemplate = ldapConnectionTemplate;
     }
 
-    public <T> T authenticate(String username, String password, EntryMapper<T> mapper) throws PasswordException {
-        Entry entry = getLdapEntryFor(username);
+    public <T> T authenticate(String username, String password, Mapper<T> mapper) {
+        Entry entry = findLdapEntryForAuthentication(username);
 
         try {
-            final PasswordWarning warning = preformBind(entry.getDn(), password);
+            final PasswordWarning warning = performBind(entry.getDn(), password);
 
             if (warning != null) {
                 LOG.warn(format("Your password will expire in {0} seconds", warning.getTimeBeforeExpiration()));
@@ -69,23 +71,12 @@ public class Ldap {
             }
 
             return mapper.map(entry);
-        } catch (LdapException e) {
+        } catch (Exception e) {
             throw new cd.go.authentication.ldap.exception.LdapException(format("Failed to authenticate user `{0}` with ldap server {1}", username, ldapConfiguration.getLdapUrlAsString()));
         }
     }
 
-    public <T> T searchUser(String username, EntryMapper<T> mapper) {
-        Entry entry = getLdapEntryFor(username);
-
-        try {
-            return mapper.map(entry);
-        } catch (LdapException e) {
-            throw new cd.go.authentication.ldap.exception.LdapException(format("Failed to search user `{0}` with ldap server {1}", username, ldapConfiguration.getLdapUrlAsString()));
-        }
-    }
-
-
-    private PasswordWarning preformBind(Dn userDn, String password) throws PasswordException {
+    private PasswordWarning performBind(Dn userDn, String password) throws PasswordException {
         final LdapApiService ldapApiService = LdapApiServiceFactory.getSingleton();
         final LdapConnectionConfig connectionConfig = connectionConfiguration.toLdapConnectionConfig(userDn.getName(), password);
         final BindRequest bindRequest = new BindRequestImpl()
@@ -104,7 +95,8 @@ public class Ldap {
         });
     }
 
-    public <T> List<T> search(final String filter, final Object[] filterArgs, final EntryMapper<T> mapper, final int maxResultCount) {
+    @Override
+    public <T> List<T> search(final String filter, final Object[] filterArgs, final Mapper<T> mapper, final int maxResultCount) {
         final List<T> searchResults = new ArrayList<>();
         for (String searchBase : ldapConfiguration.getSearchBases()) {
             int resultsToFetch = resultsToFetch(maxResultCount, searchResults.size());
@@ -131,11 +123,17 @@ public class Ldap {
         return searchResults;
     }
 
-    public List<Entry> search(final String filter, final Object[] filterArgs, final int maxResultCount) {
-        return search(filter, filterArgs, entry -> entry, maxResultCount);
+    @Override
+    public void validate() {
+        final String filter = format(ldapConfiguration.getUserSearchFilter(), "test");
+        ldapConnectionTemplate.searchFirst(ldapConfiguration.getSearchBases().get(0), filter, SearchScope.SUBTREE, entry -> entry);
     }
 
-    public <T> List<T> searchGroup(List<String> searchBases, String filter, EntryMapper<T> mapper) {
+    public List<Entry> search(final String filter, final Object[] filterArgs, final int maxResultCount) {
+        return search(filter, filterArgs, resultWrapper -> (Entry) resultWrapper.getResult(), maxResultCount);
+    }
+
+    public <T> List<T> searchGroup(List<String> searchBases, String filter, Mapper<T> mapper) {
         final List<T> searchResults = new ArrayList<>();
 
         for (String searchBase : searchBases) {
@@ -157,20 +155,19 @@ public class Ldap {
         return searchResults;
     }
 
-    public void verifyConnection() {
-        final String filter = format(ldapConfiguration.getUserSearchFilter(), "test");
-        ldapConnectionTemplate.searchFirst(ldapConfiguration.getSearchBases().get(0), filter, SearchScope.SUBTREE, entry -> entry);
-    }
-
     private int resultsToFetch(final int maxResultCount, final int resultCount) {
         return maxResultCount == 0 ? 0 : maxResultCount > resultCount ? maxResultCount - resultCount : -1;
     }
 
-    private Entry getLdapEntryFor(String username) {
-        final List<Entry> results = search(ldapConfiguration.getUserLoginFilter(), new String[]{username}, entry -> entry, 1);
+    private Entry findLdapEntryForAuthentication(String username) {
+        final List<Entry> results = search(ldapConfiguration.getUserLoginFilter(), new String[]{username}, resultWrapper -> (Entry) resultWrapper.getResult(), 0);
 
         if (results.isEmpty()) {
             throw new RuntimeException(format("User {0} does not exist in {1}", username, ldapConfiguration.getLdapUrlAsString()));
+        }
+
+        if (results.size() > 1) {
+            throw new MultipleUserDetectedException(username, ldapConfiguration.getSearchBases().toString(), ldapConfiguration.getUserLoginFilter());
         }
 
         return results.get(0);

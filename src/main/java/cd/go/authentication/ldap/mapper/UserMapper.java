@@ -16,15 +16,19 @@
 
 package cd.go.authentication.ldap.mapper;
 
-import cd.go.authentication.ldap.LdapPlugin;
+import cd.go.authentication.ldap.exception.LdapException;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.mapper.AbstractMapper;
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.exception.LdapInvalidAttributeValueException;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
-public class UserMapper extends AbstractMapper<User> {
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
+import static java.lang.String.format;
+
+public class UserMapper implements Mapper<User> {
     private final String displayNameAttribute;
     private final String emailAttribute;
     private UsernameResolver usernameResolver;
@@ -36,12 +40,30 @@ public class UserMapper extends AbstractMapper<User> {
     }
 
     @Override
-    public User mapFromResult(Attributes attributes) throws NamingException {
-        User user = new User(usernameResolver.getUsername(attributes),
-                resolveAttribute(displayNameAttribute, attributes),
-                resolveAttribute(emailAttribute, attributes), attributes);
+    public User mapObject(ResultWrapper resultWrapper) {
+        if (resultWrapper.getResult() instanceof Attributes) {
+            return mapAttributes(resultWrapper);
+        }
 
-        return user;
+        if (resultWrapper.getResult() instanceof Entry) {
+            Entry entry = (Entry) resultWrapper.getResult();
+            return new User(usernameResolver.getUsername(entry),
+                    resolveAttribute(displayNameAttribute, entry),
+                    resolveAttribute(emailAttribute, entry));
+        }
+
+        throw new LdapException(format("Failed to map '%s' to %s", resultWrapper.getResult().getClass().getName(), User.class.getName()));
+    }
+
+    private User mapAttributes(ResultWrapper resultWrapper) {
+        try {
+            Attributes attributes = (Attributes) resultWrapper.getResult();
+            return new User(usernameResolver.getUsername(attributes),
+                    resolveAttribute(displayNameAttribute, attributes),
+                    resolveAttribute(emailAttribute, attributes));
+        } catch (NamingException e) {
+            throw new LdapException(e);
+        }
     }
 
     private String resolveAttribute(String attributeName, Attributes attributes) {
@@ -49,7 +71,16 @@ public class UserMapper extends AbstractMapper<User> {
             Attribute attribute = attributes.get(attributeName);
             return attribute.get().toString();
         } catch (NullPointerException | NamingException e) {
-            LdapPlugin.LOG.error("Failed to get attribute `" + attributeName + "` value.");
+            LOG.error("Failed to get attribute `" + attributeName + "` value.");
+        }
+        return null;
+    }
+
+    private String resolveAttribute(String attributeName, Entry entry) {
+        try {
+            return entry.containsAttribute(attributeName) ? entry.get(attributeName).getString() : null;
+        } catch (LdapInvalidAttributeValueException e) {
+            LOG.error("Failed to get attribute `" + attributeName + "` value.");
         }
         return null;
     }

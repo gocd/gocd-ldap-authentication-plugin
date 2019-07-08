@@ -17,6 +17,7 @@
 package cd.go.authentication.ldap.mapper;
 
 import cd.go.authentication.ldap.exception.InvalidUsernameException;
+import org.apache.directory.api.ldap.model.entry.Entry;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -48,6 +49,25 @@ public class UsernameResolver {
             throw new InvalidUsernameException("Username can not be blank. Failed to resolve username using the attributes `sAMAccountName` and `uid`.");
         }
         return sAMAccountName != null ? sAMAccountName.get().toString() : uid.get().toString();
+    }
+
+    public String getUsername(Entry entry) {
+        if (isNotBlank(this.username)) {
+            return this.username;
+        }
+
+        org.apache.directory.api.ldap.model.entry.Attribute sAMAccountName = entry.get("sAMAccountName");
+        if (sAMAccountName != null) {
+            return sAMAccountName.get().getString();
+        }
+
+        org.apache.directory.api.ldap.model.entry.Attribute uid = entry.get("uid");
+        if (uid != null) {
+            return uid.get().getString();
+        }
+
+        LOG.error("[User Search] Failed to resolve username using the attributes `sAMAccountName` and `uid`. ");
+        throw new InvalidUsernameException("Username can not be blank. Failed to resolve username using the attributes `sAMAccountName` and `uid`.");
     }
 
     @Override

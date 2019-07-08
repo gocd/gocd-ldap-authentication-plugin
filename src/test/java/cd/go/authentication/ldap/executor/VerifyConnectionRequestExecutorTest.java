@@ -16,9 +16,9 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.Ldap;
-import cd.go.framework.ldap.LdapFactory;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.json.JSONException;

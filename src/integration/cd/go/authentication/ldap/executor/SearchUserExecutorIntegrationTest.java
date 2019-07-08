@@ -17,11 +17,11 @@
 package cd.go.authentication.ldap.executor;
 
 import cd.go.authentication.ldap.BaseIntegrationTest;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.SearchUserRequest;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.LdapFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
