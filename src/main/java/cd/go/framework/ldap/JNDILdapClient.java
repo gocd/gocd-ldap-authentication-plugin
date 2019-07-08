@@ -36,11 +36,11 @@ import static java.text.MessageFormat.format;
 import static javax.naming.Context.SECURITY_CREDENTIALS;
 import static javax.naming.Context.SECURITY_PRINCIPAL;
 
-public class Ldap implements LdapClient {
+public class JNDILdapClient implements LdapClient {
     private LdapConfiguration ldapConfiguration;
     private final int MAX_AUTHENTICATION_RESULT = 1;
 
-    public Ldap(LdapConfiguration ldapConfiguration) {
+    public JNDILdapClient(LdapConfiguration ldapConfiguration) {
         this.ldapConfiguration = ldapConfiguration;
     }
 

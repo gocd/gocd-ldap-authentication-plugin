@@ -16,12 +16,13 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapClient;
 import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.RequestBodyMother;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.Ldap;
+import cd.go.framework.ldap.JNDILdapClient;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,15 +42,15 @@ class SearchUserExecutorTest {
 
     private GoPluginApiRequest request;
     private LdapFactory ldapFactory;
-    private Ldap ldap;
+    private LdapClient ldapClient;
 
     @BeforeEach
     void setUp() {
         request = mock(GoPluginApiRequest.class);
         ldapFactory = mock(LdapFactory.class);
-        ldap = mock(Ldap.class);
+        ldapClient = mock(LdapClient.class);
 
-        when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldap);
+        when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldapClient);
     }
 
     @Test
@@ -62,7 +63,7 @@ class SearchUserExecutorTest {
 
         ArgumentCaptor<String> filterArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(ldap).search(filterArgumentCaptor.capture(), eq(new String[]{"some-text"}), any(UserMapper.class), eq(100));
+        verify(ldapClient).search(filterArgumentCaptor.capture(), eq(new String[]{"some-text"}), any(UserMapper.class), eq(100));
 
         final String expectedFilter = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";
         assertThat(filterArgumentCaptor.getValue()).isEqualTo(expectedFilter);
@@ -76,7 +77,7 @@ class SearchUserExecutorTest {
         new SearchUserExecutor(ldapFactory).execute(request);
 
         ArgumentCaptor<String> filterArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(ldap).search(filterArgumentCaptor.capture(), eq(new String[]{"some-text"}), any(UserMapper.class), eq(100));
+        verify(ldapClient).search(filterArgumentCaptor.capture(), eq(new String[]{"some-text"}), any(UserMapper.class), eq(100));
 
         assertThat(filterArgumentCaptor.getValue()).isEqualTo("(cn={0})");
     }
@@ -87,7 +88,7 @@ class SearchUserExecutorTest {
         when(request.requestBody()).thenReturn(searchRequestBody);
 
         final User user = new User("username", "displayName", "mail");
-        when(ldap.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenReturn(Arrays.asList(user));
+        when(ldapClient.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenReturn(Arrays.asList(user));
 
         final GoPluginApiResponse response = new SearchUserExecutor(ldapFactory).execute(request);
 
@@ -111,7 +112,7 @@ class SearchUserExecutorTest {
         final User userFromAuthConfig1 = new User("username-from-auth-config-1", "displayName-1", "mail-1");
         final User userFromAuthConfig2 = new User("username-from-auth-config-2", "displayName-2", "mail-2");
 
-        when(ldap.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenReturn(Arrays.asList(userFromAuthConfig1)).thenReturn(Arrays.asList(userFromAuthConfig2));
+        when(ldapClient.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenReturn(Arrays.asList(userFromAuthConfig1)).thenReturn(Arrays.asList(userFromAuthConfig2));
 
         final GoPluginApiResponse response = new SearchUserExecutor(ldapFactory).execute(request);
 
@@ -139,7 +140,7 @@ class SearchUserExecutorTest {
 
         final User userFromAuthConfig2 = new User("username-from-auth-config-2", "displayName-2", "mail-2");
 
-        when(ldap.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenThrow(new RuntimeException()).thenReturn(Arrays.asList(userFromAuthConfig2));
+        when(ldapClient.search(any(String.class), eq(new String[]{"some-text"}), any(UserMapper.class), anyInt())).thenThrow(new RuntimeException()).thenReturn(Arrays.asList(userFromAuthConfig2));
 
         final GoPluginApiResponse response = new SearchUserExecutor(ldapFactory).execute(request);
 

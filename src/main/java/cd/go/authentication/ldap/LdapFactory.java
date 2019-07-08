@@ -17,6 +17,7 @@
 package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
+import cd.go.framework.ldap.JNDILdapClient;
 
 public class LdapFactory {
     public static final String USE_JNDI_LDAP_CLIENT = "use.jndi.ldap.client";
@@ -25,7 +26,7 @@ public class LdapFactory {
         boolean useJndiClient = Boolean.parseBoolean(System.getProperty(USE_JNDI_LDAP_CLIENT));
 
         if (useJndiClient) {
-            return new cd.go.framework.ldap.Ldap(configuration);
+            return new JNDILdapClient(configuration);
         }
 
         return new cd.go.apacheds.Ldap(configuration);

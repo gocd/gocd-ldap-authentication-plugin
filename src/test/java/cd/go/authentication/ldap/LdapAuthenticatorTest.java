@@ -18,7 +18,6 @@ package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.mapper.*;
 import cd.go.authentication.ldap.model.*;
-import cd.go.framework.ldap.Ldap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +34,7 @@ class LdapAuthenticatorTest {
     private AuthConfig authConfig;
     private LdapFactory ldapFactory;
     private LdapConfiguration ldapConfiguration;
-    private Ldap ldap;
+    private LdapClient ldapClient;
     private Credentials credentials;
     private LdapAuthenticator ldapAuthenticator;
     private LdapMapperFactory ldapMapperFactory;
@@ -46,14 +45,14 @@ class LdapAuthenticatorTest {
         ldapFactory = mock(LdapFactory.class);
         ldapMapperFactory = mock(LdapMapperFactory.class);
         ldapConfiguration = mock(LdapConfiguration.class);
-        ldap = mock(Ldap.class);
+        ldapClient = mock(LdapClient.class);
 
         credentials = new Credentials("username", "password");
         ldapAuthenticator = new LdapAuthenticator(ldapFactory, ldapMapperFactory);
 
         when(authConfig.getId()).thenReturn("id");
         when(authConfig.getConfiguration()).thenReturn(ldapConfiguration);
-        when(ldapFactory.ldapForConfiguration(ldapConfiguration)).thenReturn(ldap);
+        when(ldapFactory.ldapForConfiguration(ldapConfiguration)).thenReturn(ldapClient);
         when(ldapMapperFactory.attributeOrEntryMapper()).thenReturn(mock(Mapper.class));
     }
 
@@ -61,7 +60,7 @@ class LdapAuthenticatorTest {
     void authenticate_shouldAuthenticateUserWithLdap() {
         ldapAuthenticator.authenticate(credentials, Collections.singletonList(authConfig));
 
-        verify(ldap).authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class));
+        verify(ldapClient).authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class));
     }
 
     @Test
@@ -70,7 +69,7 @@ class LdapAuthenticatorTest {
         final User user = new User("jduke", "Java Duke", "jduke2example.com");
         Attributes attributes = new BasicAttributes();
 
-        when(ldap.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class))).thenReturn(attributes);
+        when(ldapClient.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class))).thenReturn(attributes);
         when(ldapConfiguration.getUserMapper(new UsernameResolver(credentials.getUsername()))).thenReturn(userMapper);
         when(userMapper.mapObject(new ResultWrapper(attributes))).thenReturn(user);
 
@@ -87,8 +86,8 @@ class LdapAuthenticatorTest {
         Attributes attributes = new BasicAttributes();
 
         when(validAuthConfig.getConfiguration()).thenReturn(validLdapConfiguration);
-        when(ldapFactory.ldapForConfiguration(validAuthConfig.getConfiguration())).thenReturn(ldap);
-        when(ldap.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class))).thenThrow(new RuntimeException()).thenReturn(attributes);
+        when(ldapFactory.ldapForConfiguration(validAuthConfig.getConfiguration())).thenReturn(ldapClient);
+        when(ldapClient.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class))).thenThrow(new RuntimeException()).thenReturn(attributes);
         when(validLdapConfiguration.getUserMapper(new UsernameResolver(credentials.getUsername()))).thenReturn(userMapper);
         when(userMapper.mapObject(new ResultWrapper(attributes))).thenReturn(mock(User.class));
 
@@ -103,7 +102,7 @@ class LdapAuthenticatorTest {
         Attributes attributes = new BasicAttributes();
 
         when(ldapConfiguration.getLdapUrlAsString()).thenReturn("some-url");
-        when(ldap.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class))).thenReturn(attributes);
+        when(ldapClient.authenticate(eq(credentials.getUsername()), eq(credentials.getPassword()), any(Mapper.class))).thenReturn(attributes);
         when(ldapConfiguration.getUserMapper(new UsernameResolver(credentials.getUsername()))).thenReturn(userMapper);
         when(userMapper.mapObject(new ResultWrapper(attributes))).thenReturn(mock(User.class));
 

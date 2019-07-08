@@ -23,7 +23,6 @@ import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.SearchUserRequest;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.Ldap;
 import cd.go.plugin.base.GsonTransformer;
 import cd.go.plugin.base.executors.AbstractExecutor;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;

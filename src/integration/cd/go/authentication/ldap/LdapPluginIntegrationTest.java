@@ -25,8 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static cd.go.authentication.ldap.executor.RequestFromServer.*;
-import static cd.go.authentication.ldap.utils.Util.readResource;
-import static cd.go.authentication.ldap.utils.Util.readResourceBytes;
+import static cd.go.plugin.base.ResourceReader.readResource;
+import static cd.go.plugin.base.ResourceReader.readResourceBytes;
 import static com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse.SUCCESS_RESPONSE_CODE;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;

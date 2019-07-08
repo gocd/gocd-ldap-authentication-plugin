@@ -16,9 +16,9 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapClient;
 import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import cd.go.framework.ldap.Ldap;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.json.JSONException;
@@ -34,12 +34,12 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 class VerifyConnectionRequestExecutorTest {
     private LdapFactory ldapFactory;
-    private Ldap ldap;
+    private LdapClient ldapClient;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         ldapFactory = mock(LdapFactory.class);
-        ldap = mock(Ldap.class);
+        ldapClient = mock(LdapClient.class);
     }
 
     @Test
@@ -59,8 +59,8 @@ class VerifyConnectionRequestExecutorTest {
         DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(null, null, null);
         request.setRequestBody(vaildConfig());
 
-        when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldap);
-        doThrow(new NamingException("Cannot verify connection")).when(ldap).validate();
+        when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldapClient);
+        doThrow(new NamingException("Cannot verify connection")).when(ldapClient).validate();
 
         GoPluginApiResponse response = new VerifyConnectionRequestExecutor(ldapFactory).execute(request);
 
@@ -73,8 +73,8 @@ class VerifyConnectionRequestExecutorTest {
         DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest(null, null, null);
         request.setRequestBody(vaildConfig());
 
-        when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldap);
-        doNothing().when(ldap).validate();
+        when(ldapFactory.ldapForConfiguration(any(LdapConfiguration.class))).thenReturn(ldapClient);
+        doNothing().when(ldapClient).validate();
 
         GoPluginApiResponse response = new VerifyConnectionRequestExecutor(ldapFactory).execute(request);
 
