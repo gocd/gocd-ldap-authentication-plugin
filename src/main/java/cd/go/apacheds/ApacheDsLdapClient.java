@@ -42,18 +42,18 @@ import static cd.go.apacheds.pool.ConnectionPoolFactory.getLdapConnectionPool;
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static java.text.MessageFormat.format;
 
-public class Ldap implements LdapClient {
+public class ApacheDsLdapClient implements LdapClient {
     private final LdapConnectionTemplate ldapConnectionTemplate;
     private final LdapConfiguration ldapConfiguration;
     private ConnectionConfiguration connectionConfiguration;
 
-    public Ldap(LdapConfiguration ldapConfiguration) {
+    public ApacheDsLdapClient(LdapConfiguration ldapConfiguration) {
         this.ldapConfiguration = ldapConfiguration;
         this.connectionConfiguration = new ConnectionConfiguration(ldapConfiguration);
         this.ldapConnectionTemplate = new LdapConnectionTemplate(getLdapConnectionPool(connectionConfiguration));
     }
 
-    protected Ldap(LdapConfiguration ldapConfiguration, LdapConnectionTemplate ldapConnectionTemplate) {
+    protected ApacheDsLdapClient(LdapConfiguration ldapConfiguration, LdapConnectionTemplate ldapConnectionTemplate) {
         this.ldapConfiguration = ldapConfiguration;
         this.ldapConnectionTemplate = ldapConnectionTemplate;
     }

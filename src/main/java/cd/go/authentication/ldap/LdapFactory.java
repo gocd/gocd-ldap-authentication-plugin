@@ -16,6 +16,7 @@
 
 package cd.go.authentication.ldap;
 
+import cd.go.apacheds.ApacheDsLdapClient;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.JNDILdapClient;
 
@@ -29,6 +30,6 @@ public class LdapFactory {
             return new JNDILdapClient(configuration);
         }
 
-        return new cd.go.apacheds.Ldap(configuration);
+        return new ApacheDsLdapClient(configuration);
     }
 }

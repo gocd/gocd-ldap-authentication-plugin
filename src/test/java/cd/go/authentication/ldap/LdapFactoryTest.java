@@ -16,6 +16,7 @@
 
 package cd.go.authentication.ldap;
 
+import cd.go.apacheds.ApacheDsLdapClient;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.JNDILdapClient;
 import cd.go.plugin.base.test_helper.system_extensions.annotations.SystemProperty;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 class LdapFactoryTest {
-    private static final Class<cd.go.apacheds.Ldap> APACHE_DS_CLIENT_CLASS = cd.go.apacheds.Ldap.class;
+    private static final Class<ApacheDsLdapClient> APACHE_DS_CLIENT_CLASS = ApacheDsLdapClient.class;
     private static final Class<JNDILdapClient> JNDI_CLIENT_CLASS = JNDILdapClient.class;
     private LdapFactory ldapFactory;
 

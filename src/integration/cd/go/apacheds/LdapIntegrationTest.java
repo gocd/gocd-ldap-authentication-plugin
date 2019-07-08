@@ -37,13 +37,13 @@ import static org.assertj.core.api.Assertions.*;
 public class LdapIntegrationTest extends BaseIntegrationTest {
     @Rule
     public final ProvideSystemProperty systemProperty = new ProvideSystemProperty(USE_JNDI_LDAP_CLIENT, "false");
-    private Ldap ldap;
+    private ApacheDsLdapClient ldap;
 
     @Test
     public void authenticate_shouldAuthenticateUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         final User user = ldap.authenticate("bford", "bob", ldapConfiguration.getUserMapper(new UsernameResolver()));
 
@@ -55,7 +55,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     public void authenticate_shouldErrorOutIfFailToAuthenticateUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         assertThatCode(() -> ldap.authenticate("bford", "wrong-password", ldapConfiguration.getUserMapper(new UsernameResolver())))
                 .isInstanceOf(LdapException.class)
@@ -66,7 +66,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     public void authenticate_shouldErrorOutUserIsNotExistInLdap() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         assertThatCode(() -> ldap.authenticate("foo", "bar", ldapConfiguration.getUserMapper(new UsernameResolver())))
                 .isInstanceOf(RuntimeException.class)
@@ -76,7 +76,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     @Test
     public void authenticate_shouldErrorOutIfMultipleUserDetectedInSearchBaseWhenUserLoginFilterHasWildCard() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"}, "(uid=*{0}*)");
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         assertThatCode(() -> ldap.authenticate("neil", "neil", new LdapMapperFactory().attributeOrEntryMapper()))
                 .isInstanceOf(RuntimeException.class)
@@ -88,7 +88,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     public void search_shouldSearchUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"});
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         final List<User> users = ldap.search("(uid=*{0}*)", new String[]{"pbanks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 1);
 
@@ -100,7 +100,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     public void search_shouldSearchUsersFromMultipleSearchBases() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         final List<User> users = ldap.search("(uid=*{0}*)", new String[]{"banks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 2);
 
@@ -114,7 +114,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         final List<User> allUsers = ldap.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
@@ -130,7 +130,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
-        ldap = new Ldap(ldapConfiguration);
+        ldap = new ApacheDsLdapClient(ldapConfiguration);
 
         final List<User> allUsers = ldap.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
@@ -146,7 +146,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         LdapConfiguration ldapConfiguration = ldapConfiguration("uid=admin,ou=system", "secret", "ou=system");
 
         try {
-            new Ldap(ldapConfiguration).validate();
+            new ApacheDsLdapClient(ldapConfiguration).validate();
         } catch (Exception e) {
             fail("Should not error out when valid credentials provided");
         }
@@ -156,7 +156,7 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
     public void validate_shouldErrorOutWhenInvalidManagerDnAndPasswordProvided() {
         LdapConfiguration ldapConfiguration = ldapConfiguration("uid=admin,ou=system", "invalid-password", "ou=system");
 
-        assertThatCode(() -> new Ldap(ldapConfiguration).validate())
+        assertThatCode(() -> new ApacheDsLdapClient(ldapConfiguration).validate())
                 .isInstanceOf(LdapRuntimeException.class)
                 .hasMessageContaining("Cannot authenticate user uid=admin,ou=system");
     }

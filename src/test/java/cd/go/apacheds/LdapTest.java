@@ -48,7 +48,7 @@ class LdapTest {
                 .build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
-        final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
         final ArgumentCaptor<SearchRequest> argumentCaptor = ArgumentCaptor.forClass(SearchRequestImpl.class);
 
         when(ldapConnectionTemplate.search(argumentCaptor.capture(), ArgumentMatchers.<EntryMapper<Entry>>any())).thenReturn(Collections.singletonList(new DefaultEntry()));
@@ -72,7 +72,7 @@ class LdapTest {
                 .build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
-        final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
         final ArgumentCaptor<SearchRequest> argumentCaptor = ArgumentCaptor.forClass(SearchRequestImpl.class);
 
         when(ldapConnectionTemplate.search(argumentCaptor.capture(), ArgumentMatchers.<EntryMapper<Entry>>any()))
@@ -96,7 +96,7 @@ class LdapTest {
                 .build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
-        final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
         final ArgumentCaptor<SearchRequest> argumentCaptor = ArgumentCaptor.forClass(SearchRequestImpl.class);
 
         when(ldapConnectionTemplate.search(argumentCaptor.capture(), ArgumentMatchers.<EntryMapper<Entry>>any()))
@@ -117,7 +117,7 @@ class LdapTest {
                 .build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
-        final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
         final ArgumentCaptor<SearchRequest> argumentCaptor = ArgumentCaptor.forClass(SearchRequestImpl.class);
 
         when(ldapConnectionTemplate.search(argumentCaptor.capture(), ArgumentMatchers.<EntryMapper<Entry>>any())).thenReturn(Collections.singletonList(new DefaultEntry()));
@@ -138,7 +138,7 @@ class LdapTest {
         final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder().build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
-        final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
         final ArgumentCaptor<SearchRequest> argumentCaptor = ArgumentCaptor.forClass(SearchRequestImpl.class);
 
         when(ldapConnectionTemplate.search(argumentCaptor.capture(), ArgumentMatchers.<EntryMapper<Entry>>any()))
@@ -161,7 +161,7 @@ class LdapTest {
                 .withSearchBases("ou=foo,dc=bar").build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
-        final Ldap ldap = new Ldap(ldapConfiguration, ldapConnectionTemplate);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
 
         ldap.validate();
 
