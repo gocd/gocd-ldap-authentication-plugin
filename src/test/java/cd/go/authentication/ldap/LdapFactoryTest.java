@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import static cd.go.authentication.ldap.LdapFactory.USE_JNDI_LDAP_CLIENT;
+import static cd.go.authentication.ldap.PluginSystemProperty.USE_JNDI_LDAP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;

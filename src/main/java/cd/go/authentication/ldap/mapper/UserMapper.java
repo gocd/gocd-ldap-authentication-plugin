@@ -41,18 +41,23 @@ public class UserMapper implements Mapper<User> {
 
     @Override
     public User mapObject(ResultWrapper resultWrapper) {
+        LOG.debug("Given object is type of {}", resultWrapper.getResult().getClass().getName());
         if (resultWrapper.getResult() instanceof Attributes) {
             return mapAttributes(resultWrapper);
         }
 
         if (resultWrapper.getResult() instanceof Entry) {
-            Entry entry = (Entry) resultWrapper.getResult();
-            return new User(usernameResolver.getUsername(entry),
-                    resolveAttribute(displayNameAttribute, entry),
-                    resolveAttribute(emailAttribute, entry));
+            return mapEntryToUser(resultWrapper);
         }
 
         throw new LdapException(format("Failed to map '%s' to %s", resultWrapper.getResult().getClass().getName(), User.class.getName()));
+    }
+
+    private User mapEntryToUser(ResultWrapper resultWrapper) {
+        Entry entry = (Entry) resultWrapper.getResult();
+        return new User(usernameResolver.getUsername(entry),
+                resolveAttribute(displayNameAttribute, entry),
+                resolveAttribute(emailAttribute, entry));
     }
 
     private User mapAttributes(ResultWrapper resultWrapper) {

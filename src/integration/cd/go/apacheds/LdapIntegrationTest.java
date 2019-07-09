@@ -30,7 +30,7 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
 import java.util.List;
 
-import static cd.go.authentication.ldap.LdapFactory.USE_JNDI_LDAP_CLIENT;
+import static cd.go.authentication.ldap.PluginSystemProperty.USE_JNDI_LDAP_CLIENT;
 import static java.text.MessageFormat.format;
 import static org.assertj.core.api.Assertions.*;
 

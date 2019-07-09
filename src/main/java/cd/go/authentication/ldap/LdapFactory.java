@@ -20,16 +20,20 @@ import cd.go.apacheds.ApacheDsLdapClient;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.JNDILdapClient;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
+import static cd.go.authentication.ldap.PluginSystemProperty.useJNDIClient;
+
 public class LdapFactory {
-    public static final String USE_JNDI_LDAP_CLIENT = "use.jndi.ldap.client";
 
     public LdapClient ldapForConfiguration(LdapConfiguration configuration) {
-        boolean useJndiClient = Boolean.parseBoolean(System.getProperty(USE_JNDI_LDAP_CLIENT));
+        boolean useJndiClient = useJNDIClient();
 
         if (useJndiClient) {
+            LOG.debug("Using JDNI based ldap client as user has specified system property 'use.jndi.ldap.client=true'");
             return new JNDILdapClient(configuration);
         }
 
+        LOG.debug("Using apache ds ldap client.");
         return new ApacheDsLdapClient(configuration);
     }
 }

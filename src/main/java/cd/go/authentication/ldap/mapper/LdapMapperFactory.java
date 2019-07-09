@@ -18,17 +18,18 @@ package cd.go.authentication.ldap.mapper;
 
 import org.apache.directory.api.ldap.model.entry.Entry;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
+import static cd.go.authentication.ldap.PluginSystemProperty.useJNDIClient;
+
 public class LdapMapperFactory {
-    public static final String LDAP_USE_JNDI_CLIENT = "ldap.use.jndi.client";
 
     public Mapper attributeOrEntryMapper() {
-        if (useJndiClient()) {
+        if (useJNDIClient()) {
+            LOG.debug("Using attributes mapper as user has specified system property 'use.jndi.ldap.client=true'");
             return new AttributesMapper();
         }
-        return (Mapper<Entry>) resultWrapper -> (Entry) resultWrapper.getResult();
-    }
 
-    private boolean useJndiClient() {
-        return Boolean.parseBoolean(System.getProperty(LDAP_USE_JNDI_CLIENT));
+        LOG.debug("Using entry mapper.");
+        return (Mapper<Entry>) resultWrapper -> (Entry) resultWrapper.getResult();
     }
 }

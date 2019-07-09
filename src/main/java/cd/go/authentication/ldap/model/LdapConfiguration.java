@@ -31,6 +31,7 @@ import java.util.Objects;
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static cd.go.authentication.ldap.utils.Util.GSON;
 import static cd.go.authentication.ldap.utils.Util.isBlank;
+import static java.lang.String.format;
 
 public class LdapConfiguration {
     private static final String DEFAULT_USER_SEARCH_FILTER = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";
@@ -114,11 +115,11 @@ public class LdapConfiguration {
     }
 
     public String getUserLoginFilter() {
-        return userLoginFilter;
+        return format("(%s)", userLoginFilter);
     }
 
     public String getUserSearchFilter() {
-        return isBlank(this.userSearchFilter) ? DEFAULT_USER_SEARCH_FILTER : this.userSearchFilter;
+        return isBlank(this.userSearchFilter) ? DEFAULT_USER_SEARCH_FILTER : format("(%s)", this.userSearchFilter);
     }
 
     public String getDisplayNameAttribute() {
