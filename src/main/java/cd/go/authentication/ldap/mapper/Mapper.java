@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package cd.go.authentication.ldap.annotation;
+package cd.go.authentication.ldap.mapper;
 
-public interface Metadata {
-    boolean isRequired();
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.ldap.client.template.EntryMapper;
 
-    boolean isSecure();
+public interface Mapper<T> extends EntryMapper {
+    default T map(Entry entry) {
+        return mapObject(new ResultWrapper(entry));
+    }
 
-    FieldType getType();
+    T mapObject(ResultWrapper resultWrapper);
 }

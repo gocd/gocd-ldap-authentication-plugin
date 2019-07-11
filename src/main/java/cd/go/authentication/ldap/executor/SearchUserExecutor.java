@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +16,46 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapClient;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.LdapConfiguration;
+import cd.go.authentication.ldap.model.SearchUserRequest;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.Ldap;
-import cd.go.framework.ldap.LdapFactory;
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import cd.go.plugin.base.GsonTransformer;
+import cd.go.plugin.base.executors.AbstractExecutor;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
-import static cd.go.authentication.ldap.utils.Util.GSON;
 
-public class SearchUserExecutor implements RequestExecutor {
+public class SearchUserExecutor extends AbstractExecutor<SearchUserRequest> {
     public static final String SEARCH_TERM = "search_term";
     private static final int MAX_SEARCH_RESULT = 100;
-
-    private final GoPluginApiRequest request;
     private final LdapFactory ldapFactory;
 
-    public SearchUserExecutor(GoPluginApiRequest request) {
-        this(request, new LdapFactory());
+    public SearchUserExecutor() {
+        this(new LdapFactory());
     }
 
-    SearchUserExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
-        this.request = request;
+    SearchUserExecutor(LdapFactory ldapFactory) {
         this.ldapFactory = ldapFactory;
     }
 
     @Override
-    public GoPluginApiResponse execute() {
-        Map<String, String> requestParam = GSON.fromJson(request.requestBody(), Map.class);
-        String searchTerm = requestParam.get(SEARCH_TERM);
-        List<AuthConfig> authConfigs = AuthConfig.fromJSONList(request.requestBody());
+    protected GoPluginApiResponse execute(SearchUserRequest searchUserRequest) {
+        final Set<User> users = searchUsers(searchUserRequest.getSearchTerm(), searchUserRequest.getAuthConfigs());
+        return new DefaultGoPluginApiResponse(200, GsonTransformer.toJson(users));
+    }
 
-        final Set<User> users = searchUsers(searchTerm, authConfigs);
-
-        return new DefaultGoPluginApiResponse(200, GSON.toJson(users));
+    @Override
+    protected SearchUserRequest parseRequest(String requestBody) {
+        return GsonTransformer.fromJson(requestBody, SearchUserRequest.class);
     }
 
     Set<User> searchUsers(String searchTerm, List<AuthConfig> authConfigs) {
@@ -67,7 +64,7 @@ public class SearchUserExecutor implements RequestExecutor {
             final int remainingResultCount = MAX_SEARCH_RESULT - allUsers.size();
             try {
                 final LdapConfiguration configuration = authConfig.getConfiguration();
-                final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
+                final LdapClient ldap = ldapFactory.ldapForConfiguration(configuration);
                 String userSearchFilter = configuration.getUserSearchFilter();
 
                 LOG.info(String.format("[User Search] Looking up for users matching search_term: `%s`" +

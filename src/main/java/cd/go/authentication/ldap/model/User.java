@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package cd.go.authentication.ldap.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import javax.naming.directory.Attributes;
-
 public class User {
     @Expose
     @SerializedName("username")
@@ -33,18 +31,11 @@ public class User {
     @Expose
     @SerializedName("email")
     private String emailId;
-
-    private transient Attributes attributes;
-
+    
     public User(String username, String displayName, String emailId) {
-        this(username, displayName, emailId, null);
-    }
-
-    public User(String username, String displayName, String emailId, Attributes attributes) {
         this.username = username;
         this.displayName = displayName;
         this.emailId = emailId == null ? null : emailId.toLowerCase().trim();
-        this.attributes = attributes;
     }
 
     public String getUsername() {
@@ -57,10 +48,6 @@ public class User {
 
     public String getEmailId() {
         return emailId;
-    }
-
-    public Attributes getAttributes() {
-        return attributes;
     }
 
     @Override

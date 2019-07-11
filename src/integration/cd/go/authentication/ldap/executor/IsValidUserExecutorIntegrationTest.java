@@ -17,29 +17,25 @@
 package cd.go.authentication.ldap.executor;
 
 import cd.go.authentication.ldap.BaseIntegrationTest;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.model.AuthConfig;
+import cd.go.authentication.ldap.model.IsValidUserRequest;
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import cd.go.framework.ldap.LdapFactory;
 import com.google.gson.Gson;
-import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class IsValidUserExecutorIntegrationTest extends BaseIntegrationTest {
     private LdapFactory ldapFactory;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         ldapFactory = spy(new LdapFactory());
     }
 
@@ -48,9 +44,9 @@ public class IsValidUserExecutorIntegrationTest extends BaseIntegrationTest {
         final LdapConfiguration firstLdapConfig = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"});
         AuthConfig first = new AuthConfig("1", firstLdapConfig);
 
-        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("user_1", first), ldapFactory).execute().responseCode(), is(200));
+        assertThat(new IsValidUserRequestExecutor(ldapFactory).execute(createGoPluginApiRequest("user_1", first)).responseCode()).isEqualTo(200);
 
-        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("user", first), ldapFactory).execute().responseCode(), is(404));
+        assertThat(new IsValidUserRequestExecutor(ldapFactory).execute(createGoPluginApiRequest("user", first)).responseCode()).isEqualTo(404);
 
         verify(ldapFactory, times(2)).ldapForConfiguration(firstLdapConfig);
     }
@@ -60,21 +56,20 @@ public class IsValidUserExecutorIntegrationTest extends BaseIntegrationTest {
         final LdapConfiguration firstLdapConfig = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"});
         AuthConfig first = new AuthConfig("2", firstLdapConfig);
 
-        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("user_1", first), ldapFactory).execute().responseCode(), is(200));
-        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("UsEr_1", first), ldapFactory).execute().responseCode(), is(200));
+        assertThat(new IsValidUserRequestExecutor(ldapFactory).execute(createGoPluginApiRequest("user_1", first)).responseCode()).isEqualTo(200);
+        assertThat(new IsValidUserRequestExecutor(ldapFactory).execute(createGoPluginApiRequest("UsEr_1", first)).responseCode()).isEqualTo(200);
 
-        assertThat(new IsValidUserRequestExecutor(createGoPluginApiRequest("user", first), ldapFactory).execute().responseCode(), is(404));
+        assertThat(new IsValidUserRequestExecutor(ldapFactory).execute(createGoPluginApiRequest("user", first)).responseCode()).isEqualTo(404);
 
         verify(ldapFactory, times(3)).ldapForConfiguration(firstLdapConfig);
     }
 
-    private GoPluginApiRequest createGoPluginApiRequest(String username, AuthConfig authConfig) {
+    private IsValidUserRequest createGoPluginApiRequest(String username, AuthConfig authConfig) {
         final Map<String, Object> requestBodyMap = new HashMap<>();
         requestBodyMap.put("username", username);
         requestBodyMap.put("auth_config", authConfig);
 
-        final DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("foo", "1.0", "something");
-        request.setRequestBody(new Gson().toJson(requestBodyMap));
-        return request;
+        Gson gson = new Gson();
+        return gson.fromJson(gson.toJson(requestBodyMap), IsValidUserRequest.class);
     }
 }

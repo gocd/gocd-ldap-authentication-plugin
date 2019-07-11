@@ -14,6 +14,10 @@ These plugins require GoCD version v17.5 or above.
 
 - From GoCD `17.5.0` onwards the plugin comes bundled along with server, hence a separate installation is not required.
 
+## Ldap Client
+The plugin uses JNDI and ApacheDs ldap client for the authentication. Defaults to `ApacheDs client`. In order to use JNDI
+client use system property `use.jndi.ldap.client=true` while starting the GoCD server.
+
 ## Configuration
 
 The plugin requires necessary configurations to connect to LDAP/AD. The configuration can be added by adding a Authorization Configuration by visting the Authorization Configuration page under *Admin > Security*.

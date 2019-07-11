@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package cd.go.authentication.ldap.mapper;
 
-import cd.go.framework.ldap.mapper.AbstractMapper;
-
-import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
-public class AttributesMapper extends AbstractMapper<Attributes> {
+public class AttributesMapper implements Mapper<Attributes> {
+
     @Override
-    public Attributes mapFromResult(Attributes attributes) throws NamingException {
-        return attributes;
+    public Attributes mapObject(ResultWrapper resultWrapper) {
+        return (Attributes) resultWrapper.getResult();
     }
 }

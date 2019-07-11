@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package cd.go.authentication.ldap.model;
+package cd.go.authentication.ldap;
 
-import com.google.gson.annotations.SerializedName;
+import cd.go.authentication.ldap.mapper.Mapper;
 
-public enum SupportedAuthType {
-    @SerializedName("password")
-    Password,
-    @SerializedName("web")
-    Web
+import javax.naming.NamingException;
+import java.util.List;
+
+public interface LdapClient {
+    <T> T authenticate(String username, String password, Mapper<T> mapper);
+
+    <T> List<T> search(String userSearchFilter, Object[] filterArgs, Mapper<T> mapper, int maxResult);
+
+    void validate() throws NamingException;
 }

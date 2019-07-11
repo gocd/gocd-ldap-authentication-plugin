@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,41 +14,27 @@
  * limitations under the License.
  */
 
-package cd.go.authentication.ldap.annotation;
+package cd.go.authentication.ldap.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ProfileMetadata implements Metadata {
+import java.util.List;
+
+public class SearchUserRequest {
+    @Expose
+    @SerializedName("search_term")
+    private String searchTerm;
 
     @Expose
-    @SerializedName("required")
-    private boolean required;
+    @SerializedName("auth_configs")
+    private List<AuthConfig> authConfigs;
 
-    @Expose
-    @SerializedName("secure")
-    private boolean secure;
-
-    private FieldType type;
-
-    public ProfileMetadata(boolean required, boolean secure, FieldType type) {
-        this.required = required;
-        this.secure = secure;
-        this.type = type;
+    public String getSearchTerm() {
+        return searchTerm;
     }
 
-    @Override
-    public boolean isRequired() {
-        return required;
-    }
-
-    @Override
-    public boolean isSecure() {
-        return secure;
-    }
-
-    @Override
-    public FieldType getType() {
-        return type;
+    public List<AuthConfig> getAuthConfigs() {
+        return authConfigs;
     }
 }

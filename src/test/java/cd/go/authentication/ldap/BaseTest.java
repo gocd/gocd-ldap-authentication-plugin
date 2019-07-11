@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,14 @@
 
 package cd.go.authentication.ldap;
 
-import cd.go.authentication.ldap.mapper.UsernameResolver;
-import cd.go.authentication.ldap.model.LdapConfiguration;
-import org.junit.Before;
+import cd.go.plugin.base.GsonTransformer;
+import com.google.gson.reflect.TypeToken;
 
-import java.util.Arrays;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.Map;
 
 public class BaseTest {
-    protected LdapConfiguration ldapConfiguration;
-
-    @Before
-    public void setup() {
-        ldapConfiguration = mock(LdapConfiguration.class);
-
-        when(ldapConfiguration.getLdapUrl()).thenReturn("ldap://localhost:10389");
-        when(ldapConfiguration.getSearchBases()).thenReturn(Arrays.asList("ou=users,ou=system"));
-        when(ldapConfiguration.getManagerDn()).thenReturn("uid=admin,ou=system");
-        when(ldapConfiguration.getPassword()).thenReturn("secret");
-        when(ldapConfiguration.getUserLoginFilter()).thenReturn("uid");
-        when(ldapConfiguration.getDisplayNameAttribute()).thenReturn("displayName");
-        when(ldapConfiguration.getEmailAttribute()).thenReturn("mail");
-        when(ldapConfiguration.getUserMapper(new UsernameResolver())).thenCallRealMethod();
+    protected Map<String, String> stringToMap(String str) {
+        return GsonTransformer.fromJson(str, new TypeToken<Map<String, String>>() {
+        }.getType());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package cd.go.framework.ldap;
+package cd.go.authentication.ldap.exception;
 
-import cd.go.authentication.ldap.model.LdapConfiguration;
+public class LdapException extends RuntimeException {
+    public LdapException(String message) {
+        super(message);
+    }
 
-public class LdapFactory {
-    public Ldap ldapForConfiguration(LdapConfiguration configuration) {
-        return new Ldap(configuration);
+    public LdapException(Throwable cause) {
+        super(cause);
     }
 }

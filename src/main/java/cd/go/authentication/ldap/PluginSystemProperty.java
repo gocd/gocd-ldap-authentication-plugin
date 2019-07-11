@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package cd.go.framework.ldap.mapper;
+package cd.go.authentication.ldap;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
+public class PluginSystemProperty {
+    public static final String USE_JNDI_LDAP_CLIENT = "use.jndi.ldap.client";
 
-public abstract class AbstractMapper<T> {
-    public abstract T mapFromResult(Attributes attributes) throws NamingException;
+    public static boolean useJNDIClient() {
+        return Boolean.parseBoolean(System.getProperty(USE_JNDI_LDAP_CLIENT));
+    }
 }

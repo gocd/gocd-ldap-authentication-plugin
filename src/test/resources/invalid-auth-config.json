@@ -1,0 +1,8 @@
+{
+  "SearchBases": "ou=users,ou=system\nou=employee,ou=system",
+  "ManagerDN": "uid=admin,ou=system",
+  "Password": "secret",
+  "UserSearchFilter": "(cn={0})",
+  "UserLoginFilter": "uid",
+  "DisplayNameAttribute": "displayName"
+}

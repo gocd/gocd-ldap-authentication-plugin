@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,25 @@
 
 package cd.go.authentication.ldap.model;
 
-import static cd.go.authentication.ldap.utils.Util.isBlank;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class NonBlankField extends Field {
-    public NonBlankField(String key, String displayName, String defaultValue, Boolean secure, String displayOrder) {
-        super(key, displayName, defaultValue, true, secure, displayOrder);
+import java.util.List;
+
+public class AuthenticationRequest {
+    @Expose
+    @SerializedName("credentials")
+    private Credentials credentials;
+
+    @Expose
+    @SerializedName("auth_configs")
+    private List<AuthConfig> authConfigs;
+
+    public Credentials getCredentials() {
+        return credentials;
     }
 
-    @Override
-    public String doValidate(String input) {
-        if (isBlank(input)) {
-            return this.displayName + " must not be blank.";
-        }
-        return null;
+    public List<AuthConfig> getAuthConfigs() {
+        return authConfigs;
     }
-
 }

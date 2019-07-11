@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,75 +16,89 @@
 
 package cd.go.authentication.ldap.model;
 
-import cd.go.authentication.ldap.annotation.MetadataHelper;
-import cd.go.authentication.ldap.annotation.ProfileField;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.utils.Util;
+import cd.go.plugin.base.annotations.Property;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.directory.api.ldap.model.url.LdapUrl;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
+import static cd.go.authentication.ldap.LdapPlugin.LOG;
 import static cd.go.authentication.ldap.utils.Util.GSON;
 import static cd.go.authentication.ldap.utils.Util.isBlank;
-import static cd.go.authentication.ldap.utils.Util.isNotBlank;
 
 public class LdapConfiguration {
     private static final String DEFAULT_USER_SEARCH_FILTER = "(|(sAMAccountName=*{0}*)(uid=*{0}*)(cn=*{0}*)(mail=*{0}*)(otherMailbox=*{0}*))";
 
     @Expose
     @SerializedName("Url")
-    @ProfileField(key = "Url", required = true, secure = false)
+    @Property(name = "Url", required = true, secure = false)
     private String ldapUrl;
 
     @Expose
     @SerializedName("SearchBases")
-    @ProfileField(key = "SearchBases", required = true, secure = false)
+    @Property(name = "SearchBases", required = true, secure = false)
     private String searchBases;
 
     @Expose
     @SerializedName("ManagerDN")
-    @ProfileField(key = "ManagerDN", required = false, secure = false)
+    @Property(name = "ManagerDN", required = false, secure = false)
     private String managerDn;
 
     @Expose
     @SerializedName("Password")
-    @ProfileField(key = "Password", required = false, secure = true)
+    @Property(name = "Password", required = false, secure = true)
     private String password;
 
     @Expose
     @SerializedName("UserSearchFilter")
-    @ProfileField(key = "UserSearchFilter", required = false, secure = false)
+    @Property(name = "UserSearchFilter", required = false, secure = false)
     private String userSearchFilter;
 
     @Expose
     @SerializedName("UserLoginFilter")
-    @ProfileField(key = "UserLoginFilter", required = true, secure = false)
+    @Property(name = "UserLoginFilter", required = true, secure = false)
     private String userLoginFilter;
 
     @Expose
     @SerializedName("DisplayNameAttribute")
-    @ProfileField(key = "DisplayNameAttribute", required = false, secure = false)
+    @Property(name = "DisplayNameAttribute", required = false, secure = false)
     private String displayNameAttribute;
 
     @Expose
     @SerializedName("EmailAttribute")
-    @ProfileField(key = "EmailAttribute", required = false, secure = false)
+    @Property(name = "EmailAttribute", required = false, secure = false)
     private String emailAttribute;
 
     @Expose
-    @SerializedName("LdapConnectionPoolSize")
-    private String useConnectionPool = "true";
+    @SerializedName("SearchTimeout")
+    @Property(name = "SearchTimeout", required = false, secure = false)
+    private String searchTimeout = "5";
 
     public static LdapConfiguration fromJSON(String json) {
         return GSON.fromJson(json, LdapConfiguration.class);
     }
 
-    public String getLdapUrl() {
+    public String getLdapUrlAsString() {
         return ldapUrl;
+    }
+
+    public LdapUrl getLdapUrl() {
+        try {
+            return new LdapUrl(ldapUrl);
+        } catch (Exception e) {
+            LOG.error("Error while parsing url", e);
+        }
+        return null;
+    }
+
+    public boolean useSSL() {
+        return LdapUrl.LDAPS_SCHEME.equalsIgnoreCase(getLdapUrl().getScheme());
     }
 
     public List<String> getSearchBases() {
@@ -100,11 +114,11 @@ public class LdapConfiguration {
     }
 
     public String getUserLoginFilter() {
-        return userLoginFilter;
+        return Util.encloseParentheses(this.userLoginFilter);
     }
 
     public String getUserSearchFilter() {
-        return isBlank(this.userSearchFilter) ? DEFAULT_USER_SEARCH_FILTER : this.userSearchFilter;
+        return isBlank(this.userSearchFilter) ? DEFAULT_USER_SEARCH_FILTER : Util.encloseParentheses(this.userSearchFilter);
     }
 
     public String getDisplayNameAttribute() {
@@ -119,55 +133,32 @@ public class LdapConfiguration {
         return new UserMapper(resolver, getDisplayNameAttribute(), getEmailAttribute());
     }
 
-    public String useConnectionPool() {
-        return useConnectionPool;
-    }
-
-    public static List<Map<String, String>> validate(Map<String, String> properties) {
-        List<Map<String, String>> errors = MetadataHelper.validate(LdapConfiguration.class, properties);
-
-        if (isNotBlank(properties.get("ManagerDN")) && isBlank(properties.get("Password"))) {
-            LinkedHashMap<String, String> validationError = new LinkedHashMap<>();
-            validationError.put("key", "Password");
-            validationError.put("message", "Password cannot be blank when ManagerDN is provided.");
-            errors.add(validationError);
+    public int getSearchTimeout() {
+        final String timeout = StringUtils.stripToEmpty(searchTimeout);
+        if (StringUtils.isBlank(timeout)) {
+            return 5;
         }
-        return errors;
+        return Integer.parseInt(timeout);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         LdapConfiguration that = (LdapConfiguration) o;
-
-        if (ldapUrl != null ? !ldapUrl.equals(that.ldapUrl) : that.ldapUrl != null) return false;
-        if (searchBases != null ? !searchBases.equals(that.searchBases) : that.searchBases != null) return false;
-        if (managerDn != null ? !managerDn.equals(that.managerDn) : that.managerDn != null) return false;
-        if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        if (userSearchFilter != null ? !userSearchFilter.equals(that.userSearchFilter) : that.userSearchFilter != null)
-            return false;
-        if (userLoginFilter != null ? !userLoginFilter.equals(that.userLoginFilter) : that.userLoginFilter != null)
-            return false;
-        if (displayNameAttribute != null ? !displayNameAttribute.equals(that.displayNameAttribute) : that.displayNameAttribute != null)
-            return false;
-        if (emailAttribute != null ? !emailAttribute.equals(that.emailAttribute) : that.emailAttribute != null)
-            return false;
-        return useConnectionPool != null ? useConnectionPool.equals(that.useConnectionPool) : that.useConnectionPool == null;
+        return Objects.equals(ldapUrl, that.ldapUrl) &&
+                Objects.equals(searchBases, that.searchBases) &&
+                Objects.equals(managerDn, that.managerDn) &&
+                Objects.equals(password, that.password) &&
+                Objects.equals(userSearchFilter, that.userSearchFilter) &&
+                Objects.equals(userLoginFilter, that.userLoginFilter) &&
+                Objects.equals(displayNameAttribute, that.displayNameAttribute) &&
+                Objects.equals(emailAttribute, that.emailAttribute) &&
+                Objects.equals(searchTimeout, that.searchTimeout);
     }
 
     @Override
     public int hashCode() {
-        int result = ldapUrl != null ? ldapUrl.hashCode() : 0;
-        result = 31 * result + (searchBases != null ? searchBases.hashCode() : 0);
-        result = 31 * result + (managerDn != null ? managerDn.hashCode() : 0);
-        result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (userSearchFilter != null ? userSearchFilter.hashCode() : 0);
-        result = 31 * result + (userLoginFilter != null ? userLoginFilter.hashCode() : 0);
-        result = 31 * result + (displayNameAttribute != null ? displayNameAttribute.hashCode() : 0);
-        result = 31 * result + (emailAttribute != null ? emailAttribute.hashCode() : 0);
-        result = 31 * result + (useConnectionPool != null ? useConnectionPool.hashCode() : 0);
-        return result;
+        return Objects.hash(ldapUrl, searchBases, managerDn, password, userSearchFilter, userLoginFilter, displayNameAttribute, emailAttribute, searchTimeout);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,60 @@
 
 package cd.go.authentication.ldap.model;
 
-import org.junit.Test;
+import cd.go.apacheds.LdapConfigurationBuilder;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class LdapConfigurationTest {
+class LdapConfigurationTest {
 
     @Test
-    public void shouldAbleToDeserializeToLdapProfile() throws Exception {
+    void shouldAbleToDeserializeToLdapProfile() {
         String json = "{\n" +
                 "  \"ManagerDN\": \"uid=admin,ou=system\",\n" +
                 "  \"DisplayNameAttribute\": \"displayName\",\n" +
                 "  \"SearchBases\": \"ou=users,ou=system\n" +
                 "  ou=employee,ou=system\",\n" +
                 "  \"UserLoginFilter\": \"uid\",\n" +
-                "  \"UserSearchFilter\": \"(cn={0})\",\n" +
+                "  \"UserSearchFilter\": \"cn={0}\",\n" +
                 "  \"Url\": \"ldap://localhost:10389\",\n" +
                 "  \"Password\": \"secret\"\n" +
                 "}";
 
         LdapConfiguration ldapConfiguration = LdapConfiguration.fromJSON(json);
 
-        assertNotNull(ldapConfiguration);
-        assertThat(ldapConfiguration.getLdapUrl(), is("ldap://localhost:10389"));
-        assertThat(ldapConfiguration.getSearchBases(), contains("ou=users,ou=system", "ou=employee,ou=system"));
-        assertThat(ldapConfiguration.getManagerDn(), is("uid=admin,ou=system"));
-        assertThat(ldapConfiguration.getPassword(), is("secret"));
-        assertThat(ldapConfiguration.getUserLoginFilter(), is("uid"));
-        assertThat(ldapConfiguration.getDisplayNameAttribute(), is("displayName"));
-        assertThat(ldapConfiguration.getEmailAttribute(), is("mail"));
-        assertThat(ldapConfiguration.getUserSearchFilter(), is("(cn={0})"));
+        assertThat(ldapConfiguration).isNotNull();
+        assertThat(ldapConfiguration.getLdapUrlAsString()).isEqualTo("ldap://localhost:10389");
+        assertThat(ldapConfiguration.getSearchBases()).containsExactly("ou=users,ou=system", "ou=employee,ou=system");
+        assertThat(ldapConfiguration.getManagerDn()).isEqualTo("uid=admin,ou=system");
+        assertThat(ldapConfiguration.getPassword()).isEqualTo("secret");
+        assertThat(ldapConfiguration.getUserLoginFilter()).isEqualTo("(uid)");
+        assertThat(ldapConfiguration.getDisplayNameAttribute()).isEqualTo("displayName");
+        assertThat(ldapConfiguration.getEmailAttribute()).isEqualTo("mail");
+        assertThat(ldapConfiguration.getUserSearchFilter()).isEqualTo("(cn={0})");
+    }
+
+    @Nested
+    class EncloseInCurlyBraces {
+        @Test
+        void userLoginFilter() {
+            LdapConfigurationBuilder builder = new LdapConfigurationBuilder();
+
+            assertThat(builder.withUserLoginFilter("uid={0}").build().getUserLoginFilter()).isEqualTo("(uid={0})");
+            assertThat(builder.withUserLoginFilter("(uid={0})").build().getUserLoginFilter()).isEqualTo("(uid={0})");
+            assertThat(builder.withUserLoginFilter("(uid={0}").build().getUserLoginFilter()).isEqualTo("(uid={0}");
+            assertThat(builder.withUserLoginFilter("uid={0})").build().getUserLoginFilter()).isEqualTo("uid={0})");
+        }
+
+        @Test
+        void userSearchFilter() {
+            LdapConfigurationBuilder builder = new LdapConfigurationBuilder();
+
+            assertThat(builder.withUserSearchFilter("sAMAccountName={0}").build().getUserSearchFilter()).isEqualTo("(sAMAccountName={0})");
+            assertThat(builder.withUserSearchFilter("(sAMAccountName={0})").build().getUserSearchFilter()).isEqualTo("(sAMAccountName={0})");
+            assertThat(builder.withUserSearchFilter("(sAMAccountName={0}").build().getUserSearchFilter()).isEqualTo("(sAMAccountName={0}");
+            assertThat(builder.withUserSearchFilter("sAMAccountName={0})").build().getUserSearchFilter()).isEqualTo("sAMAccountName={0})");
+        }
     }
 }

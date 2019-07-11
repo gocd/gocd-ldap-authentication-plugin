@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
@@ -37,13 +35,13 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNotNull(response);
-        assertThat(response.getUser(), is(new User("bford", "Bob Ford", "bford@example.com")));
-        assertThat(response.getConfigUsedForAuthentication(), is(authConfig));
+        assertThat(response).isNotNull();
+        assertThat(response.getUser()).isEqualTo(new User("bford", "Bob Ford", "bford@example.com"));
+        assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfig);
     }
 
     @Test
-    public void shouldAuthenticateAgainstMultipleSearchBases() throws Exception {
+    public void shouldAuthenticateAgainstMultipleSearchBases() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
 
         AuthConfig authConfig = new AuthConfig("auth_config", ldapConfiguration);
@@ -52,14 +50,13 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNotNull(response);
-        assertThat(response.getUser(), is(new User("sbanks", "S.Banks", "sbanks@example.com")));
-        assertThat(response.getConfigUsedForAuthentication(), is(authConfig));
-        assertThat(response.getUser().getAttributes().get("dn").get().toString(), endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system"));
+        assertThat(response).isNotNull();
+        assertThat(response.getUser()).isEqualTo(new User("sbanks", "S.Banks", "sbanks@example.com"));
+        assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfig);
     }
 
     @Test
-    public void shouldAuthenticateAgainstMultipleAuthConfig() throws Exception {
+    public void shouldAuthenticateAgainstMultipleAuthConfig() {
         AuthConfig authConfigForEmployees = new AuthConfig("auth_config_employees", ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"}));
         AuthConfig authConfigForClients = new AuthConfig("auth_config_clients", ldapConfiguration(new String[]{"ou=Clients,ou=Enterprise,ou=Principal,ou=system"}));
 
@@ -67,10 +64,9 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Arrays.asList(authConfigForEmployees, authConfigForClients));
 
-        assertNotNull(response);
-        assertThat(response.getUser(), is(new User("sbanks", "S.Banks", "sbanks@example.com")));
-        assertThat(response.getConfigUsedForAuthentication(), is(authConfigForClients));
-        assertThat(response.getUser().getAttributes().get("dn").get().toString(), endsWith("ou=Clients,ou=Enterprise,ou=Principal,ou=system"));
+        assertThat(response).isNotNull();
+        assertThat(response.getUser()).isEqualTo(new User("sbanks", "S.Banks", "sbanks@example.com"));
+        assertThat(response.getConfigUsedForAuthentication()).isEqualTo(authConfigForClients);
     }
 
     @Test
@@ -82,7 +78,7 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNull(response);
+        assertThat(response).isNull();
     }
 
     @Test
@@ -94,7 +90,7 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNull(response);
+        assertThat(response).isNull();
     }
 
     @Test
@@ -106,6 +102,6 @@ public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
         final AuthenticationResponse response = new LdapAuthenticator().authenticate(credentials, Collections.singletonList(authConfig));
 
-        assertNull(response);
+        assertThat(response).isNull();
     }
 }

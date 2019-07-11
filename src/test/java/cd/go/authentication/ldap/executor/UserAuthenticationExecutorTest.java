@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,30 +21,30 @@ import cd.go.authentication.ldap.RequestBodyMother;
 import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.Credentials;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-public class UserAuthenticationExecutorTest {
+class UserAuthenticationExecutorTest {
     private GoPluginApiRequest request;
     private LdapAuthenticator ldapAuthenticator;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         request = mock(GoPluginApiRequest.class);
         ldapAuthenticator = mock(LdapAuthenticator.class);
     }
 
     @Test
-    public void shouldAuthenticateAUser() throws Exception {
+    void shouldAuthenticateAUser() {
         final String requestBody = RequestBodyMother.forAuthenticate("bford", "bob", "ou=users,ou=system");
         final List<AuthConfig> authConfigs = AuthConfig.fromJSONList(requestBody);
         when(request.requestBody()).thenReturn(requestBody);
 
-        new UserAuthenticationExecutor(request, ldapAuthenticator).execute();
+        new UserAuthenticationExecutor(ldapAuthenticator).execute(request);
 
         verify(ldapAuthenticator).authenticate(new Credentials("bford", "bob"), authConfigs);
     }

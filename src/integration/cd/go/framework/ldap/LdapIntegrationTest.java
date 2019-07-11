@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,141 +17,139 @@
 package cd.go.framework.ldap;
 
 import cd.go.authentication.ldap.BaseIntegrationTest;
+import cd.go.authentication.ldap.exception.LdapException;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-import javax.naming.AuthenticationException;
-import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import java.util.List;
 
+import static cd.go.authentication.ldap.PluginSystemProperty.USE_JNDI_LDAP_CLIENT;
 import static java.text.MessageFormat.format;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class LdapIntegrationTest extends BaseIntegrationTest {
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public final ProvideSystemProperty systemProperty = new ProvideSystemProperty(USE_JNDI_LDAP_CLIENT, "true");
+    private JNDILdapClient JNDILdapClient;
 
     @Test
-    public void authenticate_shouldAuthenticateUser() throws Exception {
+    public void authenticate_shouldAuthenticateUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        final User user = ldapSpy.authenticate("bford", "bob", ldapConfiguration.getUserMapper(new UsernameResolver()));
+        final User user = JNDILdapClient.authenticate("bford", "bob", ldapConfiguration.getUserMapper(new UsernameResolver()));
 
-        assertNotNull(user);
-        assertThat(user, is(new User("bford", "Bob Ford", "bford@example.com")));
+        assertThat(user).isNotNull();
+        assertThat(user).isEqualTo(new User("bford", "Bob Ford", "bford@example.com"));
 
-        verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
+        verify(JNDILdapClient, times(2)).closeContextSilently(any(DirContext.class));
     }
 
     @Test
-    public void authenticate_shouldErrorOutIfFailToAuthenticateUser() throws Exception {
+    public void authenticate_shouldErrorOutIfFailToAuthenticateUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        thrown.expect(AuthenticationException.class);
-        thrown.expectMessage("[LDAP: error code 49 - INVALID_CREDENTIALS: Bind failed: ERR_229 Cannot authenticate user uid=bob,ou=Employees,ou=Enterprise,ou=Principal,ou=system]");
+        assertThatCode(() -> JNDILdapClient.authenticate("bford", "wrong-password", ldapConfiguration.getUserMapper(new UsernameResolver())))
+                .isInstanceOf(LdapException.class)
+                .hasMessageContaining("Cannot authenticate user uid=bob,ou=Employees,ou=Enterprise,ou=Principal,ou=system");
 
-        ldapSpy.authenticate("bford", "wrong-password", ldapConfiguration.getUserMapper(new UsernameResolver()));
-
-        verify(ldapSpy).closeContextSilently(any(DirContext.class));
+        verify(JNDILdapClient).closeContextSilently(any(DirContext.class));
     }
 
     @Test
-    public void authenticate_shouldErrorOutUserIsNotExistInLdap() throws Exception {
+    public void authenticate_shouldErrorOutUserIsNotExistInLdap() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"});
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage(format("User foo does not exist in {0}", ldapConfiguration.getLdapUrl()));
+        assertThatCode(() -> JNDILdapClient.authenticate("foo", "bar", ldapConfiguration.getUserMapper(new UsernameResolver())))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(format("User foo does not exist in {0}", ldapConfiguration.getLdapUrlAsString()));
 
-        ldapSpy.authenticate("foo", "bar", ldapConfiguration.getUserMapper(new UsernameResolver()));
-
-        verify(ldapSpy).closeContextSilently(any(DirContext.class));
+        verify(JNDILdapClient).closeContextSilently(any(DirContext.class));
     }
 
     @Test
-    public void authenticate_shouldErrorOutIfMultipleUserDetectedInSearchBaseWhenUserLoginFilterHasWildCard() throws NamingException {
+    public void authenticate_shouldErrorOutIfMultipleUserDetectedInSearchBaseWhenUserLoginFilterHasWildCard() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"}, "(uid=*{0}*)");
-        final Ldap ldap = new Ldap(ldapConfiguration);
+        JNDILdapClient = new JNDILdapClient(ldapConfiguration);
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Found multiple users in search base `ou=system` with username `neil`. It is not recommended to have wildcard(`*{0}*`, `{0}*` or `*{0}`) in `UserLoginFilter` field as it can match other users.");
+        assertThatCode(() -> JNDILdapClient.authenticate("neil", "neil", ldapConfiguration.getUserMapper(new UsernameResolver())))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Found multiple users in search base `ou=system` with username `neil`. It is not recommended to have wildcard(`*{0}*`, `{0}*` or `*{0}`) in `UserLoginFilter` field as it can match other users.");
 
-        ldap.authenticate("neil", "neil", ldapConfiguration.getUserMapper(new UsernameResolver()));
     }
 
     @Test
-    public void search_shouldSearchUser() throws Exception {
+    public void search_shouldSearchUser() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system"});
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"pbanks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 1);
+        final List<User> users = JNDILdapClient.search("(uid=*{0}*)", new String[]{"pbanks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 1);
 
-        assertThat(users, hasSize(1));
-        assertThat(users.get(0), is(new User("pbanks", "P.Banks", "pbanks@example.com")));
-        verify(ldapSpy).closeContextSilently(any(DirContext.class));
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0)).isEqualTo(new User("pbanks", "P.Banks", "pbanks@example.com"));
+        verify(JNDILdapClient).closeContextSilently(any(DirContext.class));
     }
 
     @Test
-    public void search_shouldSearchUsersFromMultipleSearchBases() throws Exception {
+    public void search_shouldSearchUsersFromMultipleSearchBases() {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"banks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 2);
+        final List<User> users = JNDILdapClient.search("(uid=*{0}*)", new String[]{"banks"}, ldapConfiguration.getUserMapper(new UsernameResolver()), 2);
 
-        assertThat(users, hasSize(2));
-        assertThat(users, containsInAnyOrder(new User("pbanks", "P.Banks", "pbanks@example.com"), new User("sbanks", "S.Banks", "sbanks@example.com")));
-        verify(ldapSpy).closeContextSilently(any(DirContext.class));
+        assertThat(users).hasSize(2);
+        assertThat(users).contains(new User("pbanks", "P.Banks", "pbanks@example.com"), new User("sbanks", "S.Banks", "sbanks@example.com"));
+        verify(JNDILdapClient).closeContextSilently(any(DirContext.class));
     }
 
 
     @Test
-    public void search_shouldStopSearchingWhenSpecifiedNumberOfUsersFoundInFirstSearchBase() throws Exception {
+    public void search_shouldStopSearchingWhenSpecifiedNumberOfUsersFoundInFirstSearchBase() {
         final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
+        final List<User> allUsers = JNDILdapClient.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
-        assertThat(allUsers, hasSize(5));
+        assertThat(allUsers).hasSize(5);
 
-        final List<User> userFoundFromFirstSearchBase = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
+        final List<User> userFoundFromFirstSearchBase = JNDILdapClient.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 3);
 
-        assertThat(userFoundFromFirstSearchBase, hasSize(3));
-        verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
+        assertThat(userFoundFromFirstSearchBase).hasSize(3);
+        verify(JNDILdapClient, times(2)).closeContextSilently(any(DirContext.class));
     }
 
     @Test
-    public void search_shouldSearchAcrossMultipleSearchBasesAndLimitTheSearchResult() throws Exception {
+    public void search_shouldSearchAcrossMultipleSearchBasesAndLimitTheSearchResult() {
         final LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=Employees,ou=Enterprise,ou=Principal,ou=system", "ou=Clients,ou=Enterprise,ou=Principal,ou=system"});
         final UserMapper userMapper = ldapConfiguration.getUserMapper(new UsernameResolver());
 
-        final Ldap ldapSpy = spy(new Ldap(ldapConfiguration));
+        JNDILdapClient = spy(new JNDILdapClient(ldapConfiguration));
 
-        final List<User> allUsers = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
+        final List<User> allUsers = JNDILdapClient.search("(uid=*{0}*)", new String[]{"a"}, userMapper, Integer.MAX_VALUE);
 
-        assertThat(allUsers, hasSize(5));
+        assertThat(allUsers).hasSize(5);
 
-        final List<User> users = ldapSpy.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 4);
+        final List<User> users = JNDILdapClient.search("(uid=*{0}*)", new String[]{"a"}, userMapper, 4);
 
-        assertThat(users, hasSize(4));
-        verify(ldapSpy, times(2)).closeContextSilently(any(DirContext.class));
+        assertThat(users).hasSize(4);
+        verify(JNDILdapClient, times(2)).closeContextSilently(any(DirContext.class));
     }
 
     @Test
@@ -159,19 +157,18 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         LdapConfiguration ldapConfiguration = ldapConfiguration("uid=admin,ou=system", "secret", "ou=system");
 
         try {
-            new Ldap(ldapConfiguration).validate();
+            new JNDILdapClient(ldapConfiguration).validate();
         } catch (Exception e) {
             fail("Should not error out when valid credentials provided");
         }
     }
 
     @Test
-    public void validate_shouldErrorOutWhenInvalidManagerDnAndPasswordProvided() throws NamingException {
+    public void validate_shouldErrorOutWhenInvalidManagerDnAndPasswordProvided() {
         LdapConfiguration ldapConfiguration = ldapConfiguration("uid=admin,ou=system", "invalid-password", "ou=system");
 
-        thrown.expect(AuthenticationException.class);
-        thrown.expectMessage("LDAP: error code 49 - INVALID_CREDENTIALS: Bind failed: ERR_229 Cannot authenticate user uid=admin,ou=system");
-
-        new Ldap(ldapConfiguration).validate();
+        assertThatCode(() -> new JNDILdapClient(ldapConfiguration).validate())
+                .isInstanceOf(LdapException.class)
+                .hasMessageContaining("Cannot authenticate user uid=admin,ou=system");
     }
 }

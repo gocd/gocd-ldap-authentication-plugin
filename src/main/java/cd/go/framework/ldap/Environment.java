@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ public class Environment {
 
     private static final String AUTHENTICATION_TYPE = "simple";
     private static final String LDAP_LDAP_CTX_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
-    private static final String LDAP_CONNECT_POOL = "com.sun.jndi.ldap.connect.pool";
 
     private LdapConfiguration ldapConfiguration;
 
@@ -34,12 +33,10 @@ public class Environment {
     }
 
     public Hashtable getEnvironments() {
-        Hashtable environments = new Hashtable(10);
+        Hashtable<String, Object> environments = new Hashtable<>(10);
         environments.put(Context.INITIAL_CONTEXT_FACTORY, LDAP_LDAP_CTX_FACTORY);
-        environments.put(Context.PROVIDER_URL, ldapConfiguration.getLdapUrl());
+        environments.put(Context.PROVIDER_URL, ldapConfiguration.getLdapUrlAsString());
         environments.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_TYPE);
-        environments.put(LDAP_CONNECT_POOL, ldapConfiguration.useConnectionPool());
-
         return environments;
     }
 }

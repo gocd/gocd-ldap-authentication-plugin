@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,11 @@ public class RequestBodyMother {
     }
 
     public static String forAuthenticate(String username, String password, String searchBase) {
+        Map<String, Object> requestMap = getRequestBodyMap(username, password, "ldap", searchBase);
+        return gson.toJson(requestMap);
+    }
+
+    public static String forValidateAuthConfig(String username, String password, String searchBase) {
         Map<String, Object> requestMap = getRequestBodyMap(username, password, "ldap", searchBase);
         return gson.toJson(requestMap);
     }

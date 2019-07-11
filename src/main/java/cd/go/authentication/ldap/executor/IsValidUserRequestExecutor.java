@@ -16,52 +16,38 @@
 
 package cd.go.authentication.ldap.executor;
 
+import cd.go.authentication.ldap.LdapClient;
+import cd.go.authentication.ldap.LdapFactory;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.AuthConfig;
+import cd.go.authentication.ldap.model.IsValidUserRequest;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.Ldap;
-import cd.go.framework.ldap.LdapFactory;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import cd.go.plugin.base.GsonTransformer;
+import cd.go.plugin.base.executors.AbstractExecutor;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
-import static cd.go.authentication.ldap.utils.Util.GSON;
 
-public class IsValidUserRequestExecutor implements RequestExecutor {
-    public static final String USERNAME = "username";
-    public static final String AUTH_CONFIG = "auth_config";
+public class IsValidUserRequestExecutor extends AbstractExecutor<IsValidUserRequest> {
     private static final int MAX_SEARCH_RESULT = Integer.MAX_VALUE;
-
-    private final GoPluginApiRequest request;
     private final LdapFactory ldapFactory;
 
-    public IsValidUserRequestExecutor(GoPluginApiRequest request) {
-        this(request, new LdapFactory());
+    public IsValidUserRequestExecutor() {
+        this(new LdapFactory());
     }
 
-    IsValidUserRequestExecutor(GoPluginApiRequest request, LdapFactory ldapFactory) {
-        this.request = request;
+    IsValidUserRequestExecutor(LdapFactory ldapFactory) {
         this.ldapFactory = ldapFactory;
     }
 
     @Override
-    public GoPluginApiResponse execute() {
-        JsonObject jsonObject = GSON.fromJson(request.requestBody(), JsonObject.class);
-        Type type = new TypeToken<AuthConfig>() {
-        }.getType();
-
-        String usernameToCheck = jsonObject.get(USERNAME).getAsString();
-        AuthConfig authConfig = GSON.fromJson(jsonObject.get(AUTH_CONFIG).toString(), type);
-
-        final User found = findUser(usernameToCheck, authConfig);
+    protected GoPluginApiResponse execute(IsValidUserRequest isValidUserRequest) {
+        final User found = findUser(isValidUserRequest.getUsername(), isValidUserRequest.getAuthConfig());
 
         if (found != null) {
             return new DefaultGoPluginApiResponse(200);
@@ -70,10 +56,15 @@ public class IsValidUserRequestExecutor implements RequestExecutor {
         return new DefaultGoPluginApiResponse(404);
     }
 
+    @Override
+    protected IsValidUserRequest parseRequest(String requestBody) {
+        return GsonTransformer.fromJson(requestBody, IsValidUserRequest.class);
+    }
+
     private User findUser(String usernameToCheck, AuthConfig authConfig) {
         try {
             final LdapConfiguration configuration = authConfig.getConfiguration();
-            final Ldap ldap = ldapFactory.ldapForConfiguration(configuration);
+            final LdapClient ldap = ldapFactory.ldapForConfiguration(configuration);
             String userSearchFilter = configuration.getUserSearchFilter();
 
             LOG.debug(String.format("[Is User Valid] Looking up for user with name: `%s`" +
