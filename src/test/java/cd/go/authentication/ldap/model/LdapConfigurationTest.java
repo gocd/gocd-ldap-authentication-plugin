@@ -16,6 +16,8 @@
 
 package cd.go.authentication.ldap.model;
 
+import cd.go.apacheds.LdapConfigurationBuilder;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +32,7 @@ class LdapConfigurationTest {
                 "  \"SearchBases\": \"ou=users,ou=system\n" +
                 "  ou=employee,ou=system\",\n" +
                 "  \"UserLoginFilter\": \"uid\",\n" +
-                "  \"UserSearchFilter\": \"(cn={0})\",\n" +
+                "  \"UserSearchFilter\": \"cn={0}\",\n" +
                 "  \"Url\": \"ldap://localhost:10389\",\n" +
                 "  \"Password\": \"secret\"\n" +
                 "}";
@@ -42,9 +44,32 @@ class LdapConfigurationTest {
         assertThat(ldapConfiguration.getSearchBases()).containsExactly("ou=users,ou=system", "ou=employee,ou=system");
         assertThat(ldapConfiguration.getManagerDn()).isEqualTo("uid=admin,ou=system");
         assertThat(ldapConfiguration.getPassword()).isEqualTo("secret");
-        assertThat(ldapConfiguration.getUserLoginFilter()).isEqualTo("uid");
+        assertThat(ldapConfiguration.getUserLoginFilter()).isEqualTo("(uid)");
         assertThat(ldapConfiguration.getDisplayNameAttribute()).isEqualTo("displayName");
         assertThat(ldapConfiguration.getEmailAttribute()).isEqualTo("mail");
         assertThat(ldapConfiguration.getUserSearchFilter()).isEqualTo("(cn={0})");
+    }
+
+    @Nested
+    class EncloseInCurlyBraces {
+        @Test
+        void userLoginFilter() {
+            LdapConfigurationBuilder builder = new LdapConfigurationBuilder();
+
+            assertThat(builder.withUserLoginFilter("uid={0}").build().getUserLoginFilter()).isEqualTo("(uid={0})");
+            assertThat(builder.withUserLoginFilter("(uid={0})").build().getUserLoginFilter()).isEqualTo("(uid={0})");
+            assertThat(builder.withUserLoginFilter("(uid={0}").build().getUserLoginFilter()).isEqualTo("(uid={0}");
+            assertThat(builder.withUserLoginFilter("uid={0})").build().getUserLoginFilter()).isEqualTo("uid={0})");
+        }
+
+        @Test
+        void userSearchFilter() {
+            LdapConfigurationBuilder builder = new LdapConfigurationBuilder();
+
+            assertThat(builder.withUserSearchFilter("sAMAccountName={0}").build().getUserSearchFilter()).isEqualTo("(sAMAccountName={0})");
+            assertThat(builder.withUserSearchFilter("(sAMAccountName={0})").build().getUserSearchFilter()).isEqualTo("(sAMAccountName={0})");
+            assertThat(builder.withUserSearchFilter("(sAMAccountName={0}").build().getUserSearchFilter()).isEqualTo("(sAMAccountName={0}");
+            assertThat(builder.withUserSearchFilter("sAMAccountName={0})").build().getUserSearchFilter()).isEqualTo("sAMAccountName={0})");
+        }
     }
 }

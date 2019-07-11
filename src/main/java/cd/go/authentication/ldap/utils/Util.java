@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static cd.go.plugin.base.ResourceReader.readResource;
+import static java.text.MessageFormat.format;
 
 public class Util {
     public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -83,6 +84,18 @@ public class Util {
             }
         }
         return true;
+    }
+
+    public static String encloseParentheses(String filter) {
+        if (isBlank(filter)) {
+            return filter;
+        }
+
+        if (!filter.trim().startsWith("(") && !filter.trim().endsWith(")")) {
+            return format("({0})", filter.trim());
+        }
+
+        return filter;
     }
 
 }

@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConnectionConfigurationTest {
     @Test
     void shouldBuildLdapConnectionConfigFromLdapConfiguration() {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder()
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
                 .withURL("ldaps://foo:389")
                 .withSearchBases("searchBase")
                 .withManagerDN("uid=admin,ou=system")
@@ -46,11 +46,11 @@ class ConnectionConfigurationTest {
 
     @Test
     void shouldCheckEquality() {
-        assertThat(new ConnectionConfiguration(new LdapConfigurationMother.Builder().build()))
-                .isEqualTo(new ConnectionConfiguration(new LdapConfigurationMother.Builder().build()));
+        assertThat(new ConnectionConfiguration(new LdapConfigurationBuilder().build()))
+                .isEqualTo(new ConnectionConfiguration(new LdapConfigurationBuilder().build()));
 
-        assertThat(new ConnectionConfiguration(new LdapConfigurationMother.Builder().withURL("ldap://bar").build())
-                .equals(new ConnectionConfiguration(new LdapConfigurationMother.Builder().withURL("ldaps://foo").build()))
+        assertThat(new ConnectionConfiguration(new LdapConfigurationBuilder().withURL("ldap://bar").build())
+                .equals(new ConnectionConfiguration(new LdapConfigurationBuilder().withURL("ldaps://foo").build()))
         ).isFalse();
     }
 }

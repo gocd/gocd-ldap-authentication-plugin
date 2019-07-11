@@ -17,7 +17,7 @@
 package cd.go.apacheds.pool;
 
 import cd.go.apacheds.ConnectionConfiguration;
-import cd.go.apacheds.LdapConfigurationMother;
+import cd.go.apacheds.LdapConfigurationBuilder;
 import cd.go.authentication.ldap.BaseTest;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
@@ -31,7 +31,7 @@ class ConnectionPoolFactoryTest extends BaseTest {
 
     @Test
     void shouldCreateConnectionPoolUsingConnectionConfiguration() {
-        final ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(new LdapConfigurationMother.Builder().build());
+        final ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(new LdapConfigurationBuilder().build());
 
         final LdapConnectionPool ldapConnectionPool = getLdapConnectionPool(connectionConfiguration);
 
@@ -40,7 +40,7 @@ class ConnectionPoolFactoryTest extends BaseTest {
 
     @Test
     void shouldCreateConnectionPoolWithDefaultPoolConfig() {
-        final ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(new LdapConfigurationMother.Builder().build());
+        final ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(new LdapConfigurationBuilder().build());
 
         final LdapConnectionPool ldapConnectionPool = getLdapConnectionPool(connectionConfiguration);
 
@@ -62,7 +62,7 @@ class ConnectionPoolFactoryTest extends BaseTest {
 
     @Test
     void shouldCacheConnectionPoolObjectForAConnectionConfiguration() {
-        final ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(new LdapConfigurationMother.Builder().build());
+        final ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(new LdapConfigurationBuilder().build());
 
         final LdapConnectionPool ldapConnectionPoolOne = getLdapConnectionPool(connectionConfiguration);
         final LdapConnectionPool ldapConnectionPoolTwo = getLdapConnectionPool(connectionConfiguration);
@@ -73,8 +73,8 @@ class ConnectionPoolFactoryTest extends BaseTest {
 
     @Test
     void shouldCreateNewLdapConnectionPoolForDifferentConnectionConfig() {
-        final ConnectionConfiguration configuration = new ConnectionConfiguration(new LdapConfigurationMother.Builder().withURL("ldap://foo").build());
-        final ConnectionConfiguration differentConfiguration = new ConnectionConfiguration(new LdapConfigurationMother.Builder().withURL("ldap://bar").build());
+        final ConnectionConfiguration configuration = new ConnectionConfiguration(new LdapConfigurationBuilder().withURL("ldap://foo").build());
+        final ConnectionConfiguration differentConfiguration = new ConnectionConfiguration(new LdapConfigurationBuilder().withURL("ldap://bar").build());
 
         assertNotEquals(configuration, differentConfiguration);
 

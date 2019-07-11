@@ -42,7 +42,7 @@ class LdapTest {
 
     @Test
     void shouldBeAbleToSearchUsers() throws ParseException {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder()
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
                 .withSearchTimeout(10)
                 .withSearchBases("ou=foo,dc=bar")
                 .build();
@@ -67,7 +67,7 @@ class LdapTest {
 
     @Test
     void shouldAbleToFetchResultsFromMultipleSearchBase() {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder()
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
                 .withSearchBases("ou=foo,dc=bar", "ou=baz,dc=bar")
                 .build();
 
@@ -91,7 +91,7 @@ class LdapTest {
 
     @Test
     void shouldStopSearchingIfMaxResultLimitReached() {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder()
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
                 .withSearchBases("ou=foo,dc=bar", "ou=baz,dc=bar")
                 .build();
 
@@ -113,7 +113,7 @@ class LdapTest {
 
     @Test
     void shouldSearchGroupsBasedOnGroupMembershipFilter() throws Exception {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder()
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
                 .build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
@@ -135,7 +135,7 @@ class LdapTest {
 
     @Test
     void searchGroups_shouldAbleToFetchResultsFromMultipleSearchBase() {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder().build();
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder().build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
         final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
@@ -157,7 +157,7 @@ class LdapTest {
 
     @Test
     void shouldVerifyConnectionByMakingADummySearchRequest() {
-        final LdapConfiguration ldapConfiguration = new LdapConfigurationMother.Builder()
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
                 .withSearchBases("ou=foo,dc=bar").build();
 
         final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);

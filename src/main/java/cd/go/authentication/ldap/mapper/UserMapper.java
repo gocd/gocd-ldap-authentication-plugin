@@ -41,7 +41,7 @@ public class UserMapper implements Mapper<User> {
 
     @Override
     public User mapObject(ResultWrapper resultWrapper) {
-        LOG.debug("Given object is type of {}", resultWrapper.getResult().getClass().getName());
+        LOG.debug(format("Given object is type of %s", resultWrapper.getResult().getClass().getName()));
         if (resultWrapper.getResult() instanceof Attributes) {
             return mapAttributes(resultWrapper);
         }

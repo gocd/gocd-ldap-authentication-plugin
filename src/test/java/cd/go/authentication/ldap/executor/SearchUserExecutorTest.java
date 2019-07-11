@@ -22,7 +22,6 @@ import cd.go.authentication.ldap.RequestBodyMother;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
-import cd.go.framework.ldap.JNDILdapClient;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +70,7 @@ class SearchUserExecutorTest {
 
     @Test
     void shouldSearchUserUsingTheAuthConfigSearchFilter() throws Exception {
-        final String searchRequestBody = forSearchWithSearchFilter("some-text", "(cn={0})");
+        final String searchRequestBody = forSearchWithSearchFilter("some-text", "cn={0}");
         when(request.requestBody()).thenReturn(searchRequestBody);
 
         new SearchUserExecutor(ldapFactory).execute(request);
