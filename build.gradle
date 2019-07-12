@@ -95,7 +95,7 @@ dependencies {
   integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0-M24'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0-M24'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM25'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0-M24'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0-M24'
 }
