@@ -164,27 +164,34 @@ For a given Authorization Configuration verify if the plugin can connect to the 
 
 ### Enable Debug Logs
 
+#### If you are on GoCD version 19.6 and above:
+
+Edit the file `wrapper-properties.conf` on your GoCD server and add the following options:
+
+```properties
+# We recommend that you begin with the index `100` and increment the index for each system property
+wrapper.java.additional.100=-Dplugin.cd.go.authentication.ldap.log.level=debug
+```
+
+If you're running with GoCD server 19.6 and above on docker using one of the supported gocd images:
+
+`docker run -e "GOCD_SERVER_JVM_OPTIONS=-Dplugin.cd.go.authentication.ldap.log.level=debug" ...
+
+#### If you are running a version of GoCD 19.5 and lower:
+
 * On Linux:
 
-    - Before GoCD version 19.6.0:
-        Enabling debug level logging can help you troubleshoot an issue with this plugin. To enable debug level logs, edit the file `/etc/default/go-server` (for Linux) to add:
-        
-        ```shell
-        export GO_SERVER_SYSTEM_PROPERTIES="$GO_SERVER_SYSTEM_PROPERTIES -Dplugin.cd.go.authentication.ldap.log.level=debug"
-        ```
-        
-        If you're running the server via `./server.sh` script:
-        
-        ```shell
-        $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.authentication.ldap.log.level=debug" ./server.sh
-        ```
-    - After GoCD version 19.6.0:
-        Add the system property “-Dplugin.cd.go.authentication.ldap.level=debug” to `wrapper-properties.conf` file on your GoCD server. See the installation documentation for the location of `wrapper-properties.conf` file.
-        ```
-        # config/wrapper-properties.conf
-        # since the last "wrapper.java.additional" index is 15, we use the next available index.
-        wrapper.java.additional.16=-Dplugin.cd.go.authentication.ldap.log.level=debug
-        ```
+    Enabling debug level logging can help you troubleshoot an issue with this plugin. To enable debug level logs, edit the file `/etc/default/go-server` (for Linux) to add:
+
+    ```shell
+    export GO_SERVER_SYSTEM_PROPERTIES="$GO_SERVER_SYSTEM_PROPERTIES -Dplugin.cd.go.authentication.ldap.log.level=debug"
+    ```
+
+    If you're running the server via `./server.sh` script:
+
+    ```shell
+    $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.authentication.ldap.log.level=debug" ./server.sh
+    ```
 
 * On windows:
 
@@ -199,7 +206,7 @@ For a given Authorization Configuration verify if the plugin can connect to the 
 ## License
 
 ```plain
-Copyright 2019 ThoughtWorks, Inc.
+Copyright 2017 ThoughtWorks, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
