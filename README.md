@@ -179,7 +179,7 @@ If you're running with GoCD server 19.6 and above on docker using one of the sup
 docker run -e "GOCD_SERVER_JVM_OPTIONS=-Dplugin.cd.go.authentication.ldap.log.level=debug" ...
 ```
 
-#### If you are running a version of GoCD 19.5 and lower:
+#### If you are on GoCD version 19.5 and lower:
 
 * On Linux:
 
