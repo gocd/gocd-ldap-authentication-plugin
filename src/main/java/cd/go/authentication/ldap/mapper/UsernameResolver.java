@@ -58,12 +58,12 @@ public class UsernameResolver {
 
         org.apache.directory.api.ldap.model.entry.Attribute sAMAccountName = entry.get("sAMAccountName");
         if (sAMAccountName != null) {
-            return sAMAccountName.get().getString();
+            return sAMAccountName.get().getValue();
         }
 
         org.apache.directory.api.ldap.model.entry.Attribute uid = entry.get("uid");
         if (uid != null) {
-            return uid.get().getString();
+            return uid.get().getValue();
         }
 
         LOG.error("[User Search] Failed to resolve username using the attributes `sAMAccountName` and `uid`. ");
