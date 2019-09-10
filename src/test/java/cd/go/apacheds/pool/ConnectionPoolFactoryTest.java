@@ -23,6 +23,7 @@ import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.junit.jupiter.api.Test;
 
 import static cd.go.apacheds.pool.ConnectionPoolFactory.getLdapConnectionPool;
+import static org.apache.commons.pool2.impl.BaseObjectPoolConfig.DEFAULT_BLOCK_WHEN_EXHAUSTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -56,7 +57,7 @@ class ConnectionPoolFactoryTest extends BaseTest {
         assertThat(ldapConnectionPool.getTestOnBorrow()).isEqualTo(false);
         assertThat(ldapConnectionPool.getTestOnReturn()).isEqualTo(false);
         assertThat(ldapConnectionPool.getTestWhileIdle()).isEqualTo(false);
-        assertThat(ldapConnectionPool.getBlockWhenExhausted()).isEqualTo(ldapConnectionPool.getBlockWhenExhausted());
+        assertThat(ldapConnectionPool.getBlockWhenExhausted()).isEqualTo(DEFAULT_BLOCK_WHEN_EXHAUSTED);
     }
 
     @Test
