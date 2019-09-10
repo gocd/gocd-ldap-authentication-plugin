@@ -18,7 +18,7 @@ package cd.go.apacheds;
 
 import cd.go.authentication.ldap.BaseIntegrationTest;
 import cd.go.authentication.ldap.exception.LdapException;
-import cd.go.authentication.ldap.mapper.LdapMapperFactory;
+import cd.go.authentication.ldap.exception.MultipleUserDetectedException;
 import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.LdapConfiguration;
@@ -78,8 +78,8 @@ public class LdapIntegrationTest extends BaseIntegrationTest {
         LdapConfiguration ldapConfiguration = ldapConfiguration(new String[]{"ou=system"}, "(uid=*{0}*)");
         ldap = new ApacheDsLdapClient(ldapConfiguration);
 
-        assertThatCode(() -> ldap.authenticate("neil", "neil", new LdapMapperFactory().attributeOrEntryMapper()))
-                .isInstanceOf(RuntimeException.class)
+        assertThatCode(() -> ldap.authenticate("neil", "neil", ldapConfiguration.getUserMapper(new UsernameResolver())))
+                .isInstanceOf(MultipleUserDetectedException.class)
                 .hasMessageContaining("Found multiple users in search base `[ou=system]` with username `neil`. It is not recommended to have wildcard(`*{0}*`, `{0}*` or `*{0}`) in `UserLoginFilter` field as it can match other users.");
 
     }

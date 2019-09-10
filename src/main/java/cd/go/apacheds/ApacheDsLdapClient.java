@@ -34,7 +34,6 @@ import org.apache.directory.ldap.client.template.LdapConnectionTemplate;
 import org.apache.directory.ldap.client.template.PasswordWarning;
 import org.apache.directory.ldap.client.template.exception.PasswordException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +88,7 @@ public class ApacheDsLdapClient implements LdapClient {
         }.process(() -> {
             try (LdapNetworkConnection ldapNetworkConnection = new LdapNetworkConnection(connectionConfig)) {
                 return ldapNetworkConnection.bind(bindRequest);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });

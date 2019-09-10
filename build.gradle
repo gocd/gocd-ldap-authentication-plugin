@@ -78,26 +78,26 @@ dependencies {
   compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: '19.2.0'
   compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
   compile group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '0.0.1'
-  compile group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.0'
-  compile group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: '1.0.0'
+  compile group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '2.0.0.AM1'
+  compile group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: '2.0.0.AM1'
 
   testCompile group: 'cd.go.plugin', name: 'go-plugin-api', version: '17.3.0'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
   testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
-  testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
+  testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.0'
+  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.1'
 
   //This is used in integration test
   integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
   integrationTestCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
-  integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0-M24'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0-M24'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0-M24'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0-M24'
+  integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0.AM25'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0.AM25'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM25'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM25'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM25'
 }
 
 test {
