@@ -92,7 +92,7 @@ dependencies {
   //This is used in integration test
   integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
   integrationTestCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
-  integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
+  integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.29'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0.AM25'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0.AM25'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM25'
