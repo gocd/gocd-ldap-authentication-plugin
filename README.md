@@ -204,6 +204,11 @@ docker run -e "GOCD_SERVER_JVM_OPTIONS=-Dplugin.cd.go.authentication.ldap.log.le
     # since the last "wrapper.java.additional" index is 15, we use the next available index.
     wrapper.java.additional.16=-Dplugin.cd.go.authentication.ldap.log.level=debug
     ```
+### Known issues while upgrading to Plugin version 2.0.1-90
+
+  * A must change would be to now specify a fully qualified ManagerDN instead of just username.
+  * The user search base specified should return unique result for the given username.
+
 
 ## License
 
