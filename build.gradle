@@ -97,7 +97,7 @@ dependencies {
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0.AM25'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM25'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM25'
-  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM25'
+  integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM26'
 }
 
 test {
