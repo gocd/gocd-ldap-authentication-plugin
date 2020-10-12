@@ -90,7 +90,7 @@ dependencies {
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.2'
 
   //This is used in integration test
-  integrationTestCompile group: 'junit', name: 'junit', version: '4.13'
+  integrationTestCompile group: 'junit', name: 'junit', version: '4.13.1'
   integrationTestCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
   integrationTestCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
   integrationTestCompile group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0.AM25'
