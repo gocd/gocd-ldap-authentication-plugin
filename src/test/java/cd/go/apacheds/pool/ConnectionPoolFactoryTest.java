@@ -19,11 +19,11 @@ package cd.go.apacheds.pool;
 import cd.go.apacheds.ConnectionConfiguration;
 import cd.go.apacheds.LdapConfigurationBuilder;
 import cd.go.authentication.ldap.BaseTest;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.junit.jupiter.api.Test;
 
 import static cd.go.apacheds.pool.ConnectionPoolFactory.getLdapConnectionPool;
+import static org.apache.commons.pool2.impl.BaseObjectPoolConfig.DEFAULT_BLOCK_WHEN_EXHAUSTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -46,9 +46,9 @@ class ConnectionPoolFactoryTest extends BaseTest {
 
         assertThat(ldapConnectionPool).isNotNull();
         assertThat(ldapConnectionPool.getLifo()).isEqualTo(true);
-        assertThat(ldapConnectionPool.getMaxActive()).isEqualTo(250);
+        assertThat(ldapConnectionPool.getMaxTotal()).isEqualTo(250);
         assertThat(ldapConnectionPool.getMaxIdle()).isEqualTo(50);
-        assertThat(ldapConnectionPool.getMaxWait()).isEqualTo(-1L);
+        assertThat(ldapConnectionPool.getMaxWaitMillis()).isEqualTo(-1L);
         assertThat(ldapConnectionPool.getMinIdle()).isEqualTo(0);
         assertThat(ldapConnectionPool.getNumTestsPerEvictionRun()).isEqualTo(3);
         assertThat(ldapConnectionPool.getSoftMinEvictableIdleTimeMillis()).isEqualTo(-1L);
@@ -57,7 +57,7 @@ class ConnectionPoolFactoryTest extends BaseTest {
         assertThat(ldapConnectionPool.getTestOnBorrow()).isEqualTo(false);
         assertThat(ldapConnectionPool.getTestOnReturn()).isEqualTo(false);
         assertThat(ldapConnectionPool.getTestWhileIdle()).isEqualTo(false);
-        assertThat(ldapConnectionPool.getWhenExhaustedAction()).isEqualTo(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
+        assertThat(ldapConnectionPool.getBlockWhenExhausted()).isEqualTo(DEFAULT_BLOCK_WHEN_EXHAUSTED);
     }
 
     @Test

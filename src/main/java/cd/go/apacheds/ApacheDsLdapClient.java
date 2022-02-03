@@ -22,7 +22,8 @@ import cd.go.authentication.ldap.mapper.Mapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import org.apache.directory.api.ldap.codec.api.LdapApiService;
 import org.apache.directory.api.ldap.codec.api.LdapApiServiceFactory;
-import org.apache.directory.api.ldap.extras.controls.ppolicy_impl.PasswordPolicyDecorator;
+import org.apache.directory.api.ldap.extras.controls.ppolicy_impl.PasswordPolicyRequestFactory;
+import org.apache.directory.api.ldap.extras.controls.ppolicy_impl.PasswordPolicyResponseFactory;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.*;
@@ -81,7 +82,8 @@ public class ApacheDsLdapClient implements LdapClient {
         final BindRequest bindRequest = new BindRequestImpl()
                 .setName(userDn.getName())
                 .setCredentials(password)
-                .addControl(new PasswordPolicyDecorator(ldapApiService));
+                .addControl(new PasswordPolicyRequestFactory(ldapApiService).newControl())
+                .addControl(new PasswordPolicyResponseFactory(ldapApiService).newControl());
 
         LOG.debug("Performing bind using userDn `{0}`.");
         return new AbstractPasswordPolicyResponder(ldapApiService) {
