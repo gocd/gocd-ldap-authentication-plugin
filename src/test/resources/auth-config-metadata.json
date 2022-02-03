@@ -2,7 +2,7 @@
   {
     "key": "Url",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": true,
       "secure": false
     }
@@ -10,7 +10,7 @@
   {
     "key": "SearchBases",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": true,
       "secure": false
     }
@@ -18,7 +18,7 @@
   {
     "key": "ManagerDN",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": false,
       "secure": false
     }
@@ -26,7 +26,7 @@
   {
     "key": "Password",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": false,
       "secure": true
     }
@@ -34,7 +34,7 @@
   {
     "key": "UserSearchFilter",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": false,
       "secure": false
     }
@@ -42,7 +42,7 @@
   {
     "key": "UserLoginFilter",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": true,
       "secure": false
     }
@@ -50,7 +50,7 @@
   {
     "key": "DisplayNameAttribute",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": false,
       "secure": false
     }
@@ -58,7 +58,7 @@
   {
     "key": "EmailAttribute",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": false,
       "secure": false
     }
@@ -66,7 +66,7 @@
   {
     "key": "SearchTimeout",
     "metadata": {
-      "displayName": "",
+      "display_name": "",
       "required": false,
       "secure": false
     }
