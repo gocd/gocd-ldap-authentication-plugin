@@ -18,7 +18,7 @@ package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import com.google.gson.Gson;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
 import org.apache.directory.server.core.annotations.ApplyLdifFiles;
