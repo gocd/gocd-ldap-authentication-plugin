@@ -6,19 +6,8 @@ updates:
     interval: weekly
     day: friday
   open-pull-requests-limit: 99
-  ignore:
-  - dependency-name: cd.go.plugin:go-plugin-api
-    versions:
-    - "> 19.2.0"
-  - dependency-name: junit:junit
-    versions:
-    - 4.13.1
-  - dependency-name: org.junit.jupiter:junit-jupiter-params
-    versions:
-    - 5.7.0
-  - dependency-name: org.junit.jupiter:junit-jupiter-api
-    versions:
-    - 5.7.0
-  - dependency-name: org.junit.jupiter:junit-jupiter-engine
-    versions:
-    - 5.7.0
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: friday
