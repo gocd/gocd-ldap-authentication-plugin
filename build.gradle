@@ -80,9 +80,9 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.8.2'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
 
   //This is used in integration test
   integrationTestImplementation group: 'junit', name: 'junit', version: '4.13.2'
@@ -93,6 +93,7 @@ dependencies {
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM25'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM25'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM26'
+  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.8.2'
 }
 
 test {
@@ -104,6 +105,7 @@ task integrationTest(type: Test, description: 'Runs the ldap integration tests.'
   classpath = sourceSets.integrationTest.runtimeClasspath
 
   mustRunAfter tasks.test
+  useJUnitPlatform()
 }
 
 check.dependsOn integrationTest

@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import static cd.go.authentication.ldap.PluginSystemProperty.USE_JNDI_LDAP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 class LdapFactoryTest {
     private static final Class<ApacheDsLdapClient> APACHE_DS_CLIENT_CLASS = ApacheDsLdapClient.class;
@@ -40,7 +40,7 @@ class LdapFactoryTest {
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        openMocks(this);
         ldapFactory = new LdapFactory();
 
         when(ldapConfiguration.getLdapUrl()).thenReturn(new LdapUrl());
