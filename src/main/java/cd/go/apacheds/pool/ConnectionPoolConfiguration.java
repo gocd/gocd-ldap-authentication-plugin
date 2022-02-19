@@ -16,88 +16,85 @@
 
 package cd.go.apacheds.pool;
 
-
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-
-import static org.apache.commons.pool2.impl.BaseObjectPoolConfig.DEFAULT_BLOCK_WHEN_EXHAUSTED;
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 public class ConnectionPoolConfiguration {
-    private final GenericObjectPoolConfig poolConfig;
+    private final GenericObjectPool.Config poolConfig;
 
     public ConnectionPoolConfiguration() {
-        poolConfig = new GenericObjectPoolConfig();
+        poolConfig = new GenericObjectPool.Config();
         initDefault();
     }
 
     private void initDefault() {
-        poolConfig.setLifo(true);
-        poolConfig.setMaxTotal(250);
-        poolConfig.setMaxIdle(50);
-        poolConfig.setMaxWaitMillis(-1L);
-        poolConfig.setMinIdle(0);
-        poolConfig.setNumTestsPerEvictionRun(3);
-        poolConfig.setSoftMinEvictableIdleTimeMillis(-1L);
-        poolConfig.setTimeBetweenEvictionRunsMillis(-1L);
-        poolConfig.setMinEvictableIdleTimeMillis(1000L * 60L * 30L);
-        poolConfig.setTestOnBorrow(false);
-        poolConfig.setTestOnReturn(false);
-        poolConfig.setTestWhileIdle(false);
-        poolConfig.setBlockWhenExhausted(DEFAULT_BLOCK_WHEN_EXHAUSTED);
+        poolConfig.lifo = true;
+        poolConfig.maxActive = 250;
+        poolConfig.maxIdle = 50;
+        poolConfig.maxWait = -1L;
+        poolConfig.minIdle = 0;
+        poolConfig.numTestsPerEvictionRun = 3;
+        poolConfig.softMinEvictableIdleTimeMillis = -1L;
+        poolConfig.timeBetweenEvictionRunsMillis = -1L;
+        poolConfig.minEvictableIdleTimeMillis = 1000L * 60L * 30L;
+        poolConfig.testOnBorrow = false;
+        poolConfig.testOnReturn = false;
+        poolConfig.testWhileIdle = false;
+        poolConfig.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
     }
 
-    public GenericObjectPoolConfig getPoolConfig() {
+    public GenericObjectPool.Config getPoolConfig() {
         return poolConfig;
     }
 
     public void lifo(boolean lifo) {
-        this.poolConfig.setLifo(lifo);
+        this.poolConfig.lifo = lifo;
     }
 
     public void maxActive(int maxActive) {
-        this.poolConfig.setMaxTotal(maxActive);
+        this.poolConfig.maxActive = maxActive;
     }
 
     public void maxIdle(int maxIdle) {
-        this.poolConfig.setMaxIdle(maxIdle);
+        this.poolConfig.maxIdle = maxIdle;
     }
 
     public void maxWait(int maxWait) {
-        this.poolConfig.setMaxWaitMillis(maxWait);
+        this.poolConfig.maxWait = maxWait;
     }
 
     public void minEvictableIdleTimeMillis(long minEvictableIdleTimeMillis) {
-        this.poolConfig.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        this.poolConfig.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
     }
 
     public void minIdle(int minIdle) {
-        this.poolConfig.setMinIdle(minIdle);
+        this.poolConfig.minIdle = minIdle;
     }
 
     public void numTestsPerEvictionRun(int numTestsPerEvictionRun) {
-        this.poolConfig.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+        this.poolConfig.numTestsPerEvictionRun = numTestsPerEvictionRun;
     }
 
     public void softMinEvictableIdleTimeMillis(int softMinEvictableIdleTimeMillis) {
-        this.poolConfig.setSoftMinEvictableIdleTimeMillis(softMinEvictableIdleTimeMillis);
+        this.poolConfig.softMinEvictableIdleTimeMillis = softMinEvictableIdleTimeMillis;
     }
 
     public void testOnBorrow(boolean testOnBorrow) {
-        this.poolConfig.setTestOnBorrow(testOnBorrow);
+        this.poolConfig.testOnBorrow = testOnBorrow;
     }
 
     public void testOnReturn(boolean testOnReturn) {
-        this.poolConfig.setTestOnReturn(testOnReturn);
+        this.poolConfig.testOnReturn = testOnReturn;
     }
 
     public void testWhileIdle(boolean testWhileIdle) {
-        this.poolConfig.setTestWhileIdle(testWhileIdle);
+        this.poolConfig.testWhileIdle = testWhileIdle;
     }
 
     public void timeBetweenEvictionRunsMillis(long timeBetweenEvictionRunsMillis) {
-        this.poolConfig.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        this.poolConfig.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     }
 
-    public void whenExhaustedAction(Boolean whenExhaustedAction) {
-        this.poolConfig.setBlockWhenExhausted(whenExhaustedAction);
+    public void whenExhaustedAction(byte whenExhaustedAction) {
+        this.poolConfig.whenExhaustedAction = whenExhaustedAction;
     }
 }
