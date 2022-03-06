@@ -24,7 +24,7 @@ import java.util.List;
 public interface LdapClient {
     <T> T authenticate(String username, String password, Mapper<T> mapper);
 
-    <T> List<T> search(String userSearchFilter, Object[] filterArgs, Mapper<T> mapper, int maxResult);
+    <T> List<T> search(String userSearchFilter, String[] filterArgs, Mapper<T> mapper, int maxResult);
 
     void validate() throws NamingException;
 }

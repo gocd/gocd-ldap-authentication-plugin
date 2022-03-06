@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class LdapTest {
+class ApacheDsLdapClientTest {
 
     @Test
     void shouldBeAbleToSearchUsers() throws ParseException {
@@ -63,6 +63,26 @@ class LdapTest {
         assertThat(searchRequest.getSizeLimit()).isEqualTo(1L);
         assertThat(searchRequest.getFilter()).isEqualTo(FilterParser.parse("(uid=foo)"));
         assertThat(searchRequest.getTimeLimit()).isEqualTo(10);
+    }
+
+    @Test
+    void shouldEscapeSearchFilterValues() throws ParseException {
+        final LdapConfiguration ldapConfiguration = new LdapConfigurationBuilder()
+                .withSearchTimeout(10)
+                .withSearchBases("ou=foo,dc=bar")
+                .build();
+
+        final LdapConnectionTemplate ldapConnectionTemplate = mock(LdapConnectionTemplate.class);
+        final ApacheDsLdapClient ldap = new ApacheDsLdapClient(ldapConfiguration, ldapConnectionTemplate);
+        final ArgumentCaptor<SearchRequest> argumentCaptor = ArgumentCaptor.forClass(SearchRequestImpl.class);
+
+        when(ldapConnectionTemplate.search(argumentCaptor.capture(), ArgumentMatchers.<EntryMapper<Entry>>any())).thenReturn(Collections.singletonList(new DefaultEntry()));
+
+        String injectionUserName = "*)(objectclass=*";
+        ldap.search("(uid={0})", new String[]{injectionUserName}, 1);
+
+        assertThat(argumentCaptor.getValue().getFilter())
+                .isEqualTo(FilterParser.parse("(uid=\\2A\\29\\28objectclass=\\2A)"));
     }
 
     @Test

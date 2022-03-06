@@ -25,6 +25,7 @@ import org.apache.directory.api.ldap.codec.api.LdapApiServiceFactory;
 import org.apache.directory.api.ldap.extras.controls.ppolicy_impl.PasswordPolicyDecorator;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.filter.FilterEncoder;
 import org.apache.directory.api.ldap.model.message.*;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -95,7 +96,7 @@ public class ApacheDsLdapClient implements LdapClient {
     }
 
     @Override
-    public <T> List<T> search(final String filter, final Object[] filterArgs, final Mapper<T> mapper, final int maxResultCount) {
+    public <T> List<T> search(final String filter, final String[] filterArgs, final Mapper<T> mapper, final int maxResultCount) {
         final List<T> searchResults = new ArrayList<>();
         for (String searchBase : ldapConfiguration.getSearchBases()) {
             int resultsToFetch = resultsToFetch(maxResultCount, searchResults.size());
@@ -109,7 +110,7 @@ public class ApacheDsLdapClient implements LdapClient {
                         .setScope(SearchScope.SUBTREE)
                         .addAttributes("*")
                         .setSizeLimit(resultsToFetch)
-                        .setFilter(format(filter, filterArgs))
+                        .setFilter(FilterEncoder.format(filter, filterArgs))
                         .setTimeLimit(ldapConfiguration.getSearchTimeout())
                         .setBase(new Dn(searchBase));
 
@@ -124,11 +125,11 @@ public class ApacheDsLdapClient implements LdapClient {
 
     @Override
     public void validate() {
-        final String filter = format(ldapConfiguration.getUserSearchFilter(), "test");
+        final String filter = FilterEncoder.format(ldapConfiguration.getUserSearchFilter(), "test");
         ldapConnectionTemplate.searchFirst(ldapConfiguration.getSearchBases().get(0), filter, SearchScope.SUBTREE, entry -> entry);
     }
 
-    public List<Entry> search(final String filter, final Object[] filterArgs, final int maxResultCount) {
+    public List<Entry> search(final String filter, final String[] filterArgs, final int maxResultCount) {
         return search(filter, filterArgs, resultWrapper -> (Entry) resultWrapper.getResult(), maxResultCount);
     }
 

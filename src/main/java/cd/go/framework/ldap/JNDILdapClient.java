@@ -71,7 +71,7 @@ public class JNDILdapClient implements LdapClient {
         }
     }
 
-    public <T> List<T> search(String filter, Object[] filterArgs, Mapper<T> mapper, int maxResult) {
+    public <T> List<T> search(String filter, String[] filterArgs, Mapper<T> mapper, int maxResult) {
         List<T> results = new ArrayList<>();
         DirContext dirContext = getDirContext(ldapConfiguration, ldapConfiguration.getManagerDn(), ldapConfiguration.getPassword());
 
