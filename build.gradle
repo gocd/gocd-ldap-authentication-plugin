@@ -93,7 +93,7 @@ dependencies {
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM26'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM26'
-  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.8.2'
+  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.9.0'
 }
 
 test {
