@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ThoughtWorks, Inc.
+ * Copyright 2022 Thoughtworks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-help
 
 gocdPlugin {
   id = 'cd.go.authentication.ldap'
-  pluginVersion = '2.2.0'
+  pluginVersion = '2.2.1'
   goCdVersion = '20.9.0'
   name = 'LDAP Authentication Plugin for GoCD'
   description = 'LDAP Authentication Plugin for GoCD'
-  vendorName = 'ThoughtWorks, Inc.'
+  vendorName = 'Thoughtworks, Inc.'
   vendorUrl = 'https://github.com/gocd/gocd-ldap-authentication-plugin'
 
   githubRepo {
