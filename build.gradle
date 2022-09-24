@@ -69,20 +69,29 @@ configurations {
   integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
+ext {
+  deps = [
+    gocdPluginApi: 'cd.go.plugin:go-plugin-api:22.2.0',
+  ]
+
+  versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
+}
+
 dependencies {
-  compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: '22.2.0'
+  compileOnly project.deps.gocdPluginApi
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.1'
   implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '0.0.2'
   implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.3'
   implementation group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: '1.0.0'
 
-  testImplementation group: 'cd.go.plugin', name: 'go-plugin-api', version: '22.2.0'
+  testImplementation project.deps.gocdPluginApi
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.0'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.9.0'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.0'
+  testImplementation platform('org.junit:junit-bom:5.9.1')
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
 
   //This is used in integration test
   integrationTestImplementation group: 'junit', name: 'junit', version: '4.13.2'
@@ -93,7 +102,7 @@ dependencies {
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM26'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM26'
-  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.9.0'
+  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine'
 }
 
 test {
