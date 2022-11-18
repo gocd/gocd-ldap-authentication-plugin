@@ -85,7 +85,7 @@ dependencies {
   implementation group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: '1.0.0'
 
   testImplementation project.deps.gocdPluginApi
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.9.0'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
   testImplementation platform('org.junit:junit-bom:5.9.1')
