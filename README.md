@@ -77,6 +77,15 @@ Alternatively, the configuration can be added directly to the `config.xml` using
     </property>
     ```
 
+if you are trying to configure ldaps then use the url as:
+
+    ```xml
+    <property>
+       <key>Url</key>
+       <value>ldaps://ldap-server-url:1234</value>
+    </property>
+    ```
+
 * **ManagerDN (Optional):**  The LDAP/AD manager user's DN, used to connect to the LDAP/AD server.
  
     ```xml
@@ -170,8 +179,10 @@ Edit the file `wrapper-properties.conf` on your GoCD server and add the followin
 
 ```properties
 # We recommend that you begin with the index `100` and increment the index for each system property
-wrapper.java.additional.100=-Dplugin.cd.go.authentication.ldap.log.level=debug
+wrapper.java.additional.105=-Dplugin.cd.go.authentication.ldap.log.level=debug
 ```
+
+For this to work it's extremely important that there are no other entries with the same index number for `wrapper.java.additional`. E.g. with the docker version in the docker-entrypoint.sh is a line that adds an item for `wrapper.java.additional.100` but _only_ after boot time.
 
 If you're running with GoCD server 19.6 and above on docker using one of the supported GoCD server images, set the environment variable `GOCD_SERVER_JVM_OPTIONS`:
 
