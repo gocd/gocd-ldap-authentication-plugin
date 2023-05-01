@@ -94,8 +94,6 @@ dependencies {
   testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.0.2'
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
 
-  //This is used in integration test
-  integrationTestImplementation group: 'junit', name: 'junit', version: '4.13.2'
   integrationTestImplementation group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
   integrationTestImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0.AM26'
