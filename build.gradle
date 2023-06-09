@@ -83,7 +83,7 @@ dependencies {
   implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '0.0.2'
   implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.3'
   constraints {
-    implementation('org.apache.mina:mina-core:2.0.23') {
+    implementation('org.apache.mina:mina-core:2.0.24') {
       because "api-ldap-client-api use an older MINA 2.0 version"
     }
   }
