@@ -22,7 +22,6 @@ import cd.go.authentication.ldap.utils.Util;
 import cd.go.plugin.base.annotations.Property;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.api.ldap.model.url.LdapUrl;
 
 import java.util.List;
@@ -134,11 +133,10 @@ public class LdapConfiguration {
     }
 
     public int getSearchTimeout() {
-        final String timeout = StringUtils.stripToEmpty(searchTimeout);
-        if (StringUtils.isBlank(timeout)) {
+        if (searchTimeout == null || searchTimeout.isBlank()) {
             return 5;
         }
-        return Integer.parseInt(timeout);
+        return Integer.parseInt(searchTimeout.trim());
     }
 
     @Override

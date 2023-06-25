@@ -17,7 +17,6 @@
 package cd.go.apacheds;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 
 import java.util.Objects;
@@ -58,7 +57,7 @@ public class ConnectionConfiguration {
         config.setLdapPort(this.ldapPort);
         config.setUseSsl(this.useSsl);
 
-        if (StringUtils.isNoneBlank(dn, password)) {
+        if (dn != null && !dn.isBlank() && password != null && !password.isBlank()) {
             config.setName(dn);
             config.setCredentials(password);
         }

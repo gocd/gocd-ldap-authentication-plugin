@@ -26,7 +26,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.naming.NamingException;
 import java.net.UnknownHostException;
@@ -63,7 +62,7 @@ public class VerifyConnectionRequestExecutor extends AbstractExecutor<Map<String
         }
 
         String error = verifyConnection(LdapConfiguration.fromJSON(GSON.toJson(authConfigAsMap)));
-        if (StringUtils.isNotBlank(error)) {
+        if (error != null && !error.isBlank()) {
             return responseWith("failure", error, null);
         }
 

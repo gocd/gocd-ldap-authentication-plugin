@@ -18,7 +18,6 @@ package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import com.google.gson.Gson;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
 import org.apache.directory.server.core.annotations.ApplyLdifFiles;
@@ -61,7 +60,7 @@ public abstract class BaseIntegrationTest extends AbstractLdapTestUnit {
     private Map<String, String> configAsMap(String managerDN, String password, String userLoginFilter, String[] searchBases) {
         Map<String, String> configuration = new HashMap<>();
         configuration.put("Url", String.format("ldap://localhost:%s", ldapServer.getPort()));
-        configuration.put("SearchBases", StringUtils.join(searchBases, "\n"));
+        configuration.put("SearchBases", String.join("\n", searchBases));
         configuration.put("ManagerDN", managerDN);
         configuration.put("Password", password);
         configuration.put("UserLoginFilter", userLoginFilter);

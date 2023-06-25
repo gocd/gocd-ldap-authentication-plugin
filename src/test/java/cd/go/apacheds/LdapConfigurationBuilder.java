@@ -18,7 +18,6 @@ package cd.go.apacheds;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import com.google.gson.Gson;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class LdapConfigurationBuilder {
     }
 
     public LdapConfigurationBuilder withSearchBases(String... searchBases) {
-        this.configuration.put("SearchBases", StringUtils.join(searchBases, "\n"));
+        this.configuration.put("SearchBases", String.join("\n", searchBases));
         return this;
     }
 

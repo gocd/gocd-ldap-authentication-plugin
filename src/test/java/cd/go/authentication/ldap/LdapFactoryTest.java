@@ -19,7 +19,6 @@ package cd.go.authentication.ldap;
 import cd.go.apacheds.ApacheDsLdapClient;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.framework.ldap.JNDILdapClient;
-import cd.go.plugin.base.test_helper.system_extensions.annotations.SystemProperty;
 import org.apache.directory.api.ldap.model.url.LdapUrl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
