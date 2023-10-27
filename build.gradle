@@ -101,10 +101,10 @@ dependencies {
 
   integrationTestImplementation group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
   integrationTestImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0.AM26'
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0.AM26'
+  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core', version: '2.0.0.AM27'
+  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: '2.0.0.AM27'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM26'
+  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: '2.0.0.AM27'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: '2.0.0.AM27'
   integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine'
 }
