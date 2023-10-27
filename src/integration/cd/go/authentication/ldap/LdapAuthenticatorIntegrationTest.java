@@ -17,13 +17,20 @@
 package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.model.*;
-import org.junit.Test;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
+@CreateLdapServer(transports = {
+        @CreateTransport(protocol = "LDAP")
+})
 public class LdapAuthenticatorIntegrationTest extends BaseIntegrationTest {
 
     @Test

@@ -22,8 +22,11 @@ import cd.go.authentication.ldap.model.AuthConfig;
 import cd.go.authentication.ldap.model.IsValidUserRequest;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import com.google.gson.Gson;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +34,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
+@CreateLdapServer(transports = {
+        @CreateTransport(protocol = "LDAP")
+})
 public class IsValidUserExecutorIntegrationTest extends BaseIntegrationTest {
     private LdapFactory ldapFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ldapFactory = spy(new LdapFactory());
     }
