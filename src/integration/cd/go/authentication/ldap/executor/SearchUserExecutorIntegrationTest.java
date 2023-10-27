@@ -25,8 +25,11 @@ import cd.go.authentication.ldap.model.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
@@ -34,11 +37,15 @@ import static cd.go.authentication.ldap.utils.Util.GSON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
+@CreateLdapServer(transports = {
+        @CreateTransport(protocol = "LDAP")
+})
 public class SearchUserExecutorIntegrationTest extends BaseIntegrationTest {
     private LdapFactory ldapFactory;
     private SearchUserExecutor searchUserExecutor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ldapFactory = spy(new LdapFactory());
         searchUserExecutor = new SearchUserExecutor(ldapFactory);
