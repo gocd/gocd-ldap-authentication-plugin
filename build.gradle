@@ -90,7 +90,7 @@ dependencies {
   }
 
   testImplementation project.deps.gocdPluginApi
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.9.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.10.0'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.2'
   testImplementation platform('org.junit:junit-bom:5.10.1')
