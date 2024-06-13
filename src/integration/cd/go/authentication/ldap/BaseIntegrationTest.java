@@ -18,21 +18,14 @@ package cd.go.authentication.ldap;
 
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import com.google.gson.Gson;
-import org.apache.directory.server.annotations.CreateLdapServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.core.integ.FrameworkRunner;
-import org.junit.runner.RunWith;
+import org.apache.directory.server.core.integ.ApacheDSTestExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(FrameworkRunner.class)
-@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
-@CreateLdapServer(transports = {
-        @CreateTransport(protocol = "LDAP")
-})
+@ExtendWith(ApacheDSTestExtension.class)
 public abstract class BaseIntegrationTest extends AbstractLdapTestUnit {
     protected LdapConfiguration ldapConfiguration(String[] searchBases) {
         Map<String, String> configuration = configAsMap("uid=admin,ou=system", "secret", "(uid={0})", searchBases
@@ -59,7 +52,7 @@ public abstract class BaseIntegrationTest extends AbstractLdapTestUnit {
 
     private Map<String, String> configAsMap(String managerDN, String password, String userLoginFilter, String[] searchBases) {
         Map<String, String> configuration = new HashMap<>();
-        configuration.put("Url", String.format("ldap://localhost:%s", ldapServer.getPort()));
+        configuration.put("Url", String.format("ldap://localhost:%s", classLdapServer.getPort()));
         configuration.put("SearchBases", String.join("\n", searchBases));
         configuration.put("ManagerDN", managerDN);
         configuration.put("Password", password);

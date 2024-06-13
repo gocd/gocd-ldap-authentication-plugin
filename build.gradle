@@ -100,14 +100,15 @@ dependencies {
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
   testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
 
-  integrationTestImplementation group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
+  integrationTestImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.3'
   integrationTestImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
   integrationTestImplementation project.deps.apacheDs
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: project.versions.apacheDs
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
+  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: project.versions.apacheDs
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: project.versions.apacheDs
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: project.versions.apacheDs
-  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine'
+  integrationTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+  integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
 }
 
 test {
