@@ -71,7 +71,7 @@ configurations {
 
 ext {
   deps = [
-    gocdPluginApi: 'cd.go.plugin:go-plugin-api:24.2.0',
+    gocdPluginApi: 'cd.go.plugin:go-plugin-api:24.3.0',
     apacheDs: 'org.apache.directory.server:apacheds-core:2.0.0.AM27',
   ]
 
