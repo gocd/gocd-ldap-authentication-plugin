@@ -82,7 +82,7 @@ dependencies {
   compileOnly project.deps.gocdPluginApi
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
   implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '0.0.8'
-  implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.3'
+  implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '2.1.7'
   constraints {
     implementation('org.apache.mina:mina-core:2.0.25') {
       because "api-ldap-client-api use an older MINA 2.0 version"
