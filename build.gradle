@@ -80,7 +80,7 @@ ext {
 
 dependencies {
   compileOnly project.deps.gocdPluginApi
-  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.3'
+  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.4'
   implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.3'
   constraints {
     implementation('org.apache.mina:mina-core:2.0.27') {
@@ -103,7 +103,7 @@ dependencies {
   integrationTestImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
   integrationTestImplementation project.deps.apacheDs
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: project.versions.apacheDs
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
+  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM27'
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: project.versions.apacheDs
   integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: project.versions.apacheDs
   integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine'
