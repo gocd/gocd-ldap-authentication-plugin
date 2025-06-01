@@ -80,7 +80,7 @@ ext {
 
 dependencies {
   compileOnly project.deps.gocdPluginApi
-  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.3'
+  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.4'
   implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.3'
   constraints {
     implementation('org.apache.mina:mina-core:2.0.27') {
