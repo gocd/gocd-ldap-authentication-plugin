@@ -88,7 +88,7 @@ public class ApacheDsLdapClient implements LdapClient {
         }.process(() -> {
             try (LdapNetworkConnection ldapNetworkConnection = new LdapNetworkConnection(connectionConfig)) {
                 return ldapNetworkConnection.bind(bindRequest);
-            } catch (Exception e) {
+            } catch (LdapException e) {
                 throw new RuntimeException(e);
             }
         });
