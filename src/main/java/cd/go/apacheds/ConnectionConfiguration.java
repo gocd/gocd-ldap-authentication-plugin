@@ -56,7 +56,6 @@ public class ConnectionConfiguration {
         config.setLdapHost(this.ldapHost);
         config.setLdapPort(this.ldapPort);
         config.setUseSsl(this.useSsl);
-//        config.setTrustManagers(TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).getTrustManagers());
 
         if (dn != null && !dn.isBlank() && password != null && !password.isBlank()) {
             config.setName(dn);
