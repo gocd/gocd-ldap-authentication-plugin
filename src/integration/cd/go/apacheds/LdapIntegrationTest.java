@@ -24,9 +24,12 @@ import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
 import org.apache.directory.ldap.client.template.exception.LdapRuntimeException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.properties.SystemProperties;
 
 import java.util.List;
 
@@ -34,9 +37,14 @@ import static cd.go.authentication.ldap.PluginSystemProperty.USE_JNDI_LDAP_CLIEN
 import static java.text.MessageFormat.format;
 import static org.assertj.core.api.Assertions.*;
 
+@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
+@CreateLdapServer(transports = {
+        @CreateTransport(protocol = "LDAP")
+})
 public class LdapIntegrationTest extends BaseIntegrationTest {
-    @Rule
-    public final ProvideSystemProperty systemProperty = new ProvideSystemProperty(USE_JNDI_LDAP_CLIENT, "false");
+    @SystemStub
+    public final SystemProperties systemProperty = new SystemProperties().set(USE_JNDI_LDAP_CLIENT, "false");
+
     private ApacheDsLdapClient ldap;
 
     @Test

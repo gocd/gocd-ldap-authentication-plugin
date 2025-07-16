@@ -22,9 +22,12 @@ import cd.go.authentication.ldap.mapper.UserMapper;
 import cd.go.authentication.ldap.mapper.UsernameResolver;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import cd.go.authentication.ldap.model.User;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.ProvideSystemProperty;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.junit.jupiter.api.Test;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.properties.SystemProperties;
 
 import javax.naming.directory.DirContext;
 import java.util.List;
@@ -35,9 +38,14 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
+@CreateLdapServer(transports = {
+        @CreateTransport(protocol = "LDAP")
+})
 public class LdapIntegrationTest extends BaseIntegrationTest {
-    @Rule
-    public final ProvideSystemProperty systemProperty = new ProvideSystemProperty(USE_JNDI_LDAP_CLIENT, "true");
+    @SystemStub
+    public final SystemProperties systemProperty = new SystemProperties().set(USE_JNDI_LDAP_CLIENT, "true");
+
     private JNDILdapClient jndiLdapClient;
 
     @Test

@@ -21,8 +21,11 @@ import com.google.gson.JsonObject;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.apache.commons.codec.binary.Base64;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static cd.go.authentication.ldap.executor.RequestFromServer.*;
 import static cd.go.plugin.base.ResourceReader.readResource;
@@ -32,10 +35,14 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+@ApplyLdifFiles(value = "users.ldif", clazz = BaseIntegrationTest.class)
+@CreateLdapServer(transports = {
+        @CreateTransport(protocol = "LDAP")
+})
 public class LdapPluginIntegrationTest extends BaseIntegrationTest {
     private LdapPlugin ldapPlugin;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ldapPlugin = new LdapPlugin();
         ldapPlugin.initializeGoApplicationAccessor(null);

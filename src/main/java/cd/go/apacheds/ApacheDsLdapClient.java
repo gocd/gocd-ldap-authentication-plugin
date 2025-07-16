@@ -22,7 +22,7 @@ import cd.go.authentication.ldap.mapper.Mapper;
 import cd.go.authentication.ldap.model.LdapConfiguration;
 import org.apache.directory.api.ldap.codec.api.LdapApiService;
 import org.apache.directory.api.ldap.codec.api.LdapApiServiceFactory;
-import org.apache.directory.api.ldap.extras.controls.ppolicy_impl.PasswordPolicyDecorator;
+import org.apache.directory.api.ldap.extras.controls.ppolicy.PasswordPolicyRequestImpl;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.filter.FilterEncoder;
@@ -40,7 +40,6 @@ import java.util.List;
 
 import static cd.go.apacheds.pool.ConnectionPoolFactory.getLdapConnectionPool;
 import static cd.go.authentication.ldap.LdapPlugin.LOG;
-import static java.text.MessageFormat.format;
 
 public class ApacheDsLdapClient implements LdapClient {
     private final LdapConnectionTemplate ldapConnectionTemplate;
@@ -65,14 +64,14 @@ public class ApacheDsLdapClient implements LdapClient {
             final PasswordWarning warning = performBind(entry.getDn(), password);
 
             if (warning != null) {
-                LOG.warn(format("Your password will expire in {0} seconds", warning.getTimeBeforeExpiration()));
-                LOG.warn(format("Remaining authentications before the account will be locked - {0}", warning.getGraceAuthNsRemaining()));
-                LOG.warn(format("Password reset is required - {0}", warning.isChangeAfterReset()));
+                LOG.warn("Your password will expire in {} seconds", warning.getTimeBeforeExpiration());
+                LOG.warn("Remaining authentications before the account will be locked - {}", warning.getGraceAuthNsRemaining());
+                LOG.warn("Password reset is required - {}", warning.isChangeAfterReset());
             }
 
             return mapper.map(entry);
         } catch (Exception e) {
-            throw new cd.go.authentication.ldap.exception.LdapException(format("Failed to authenticate user `{0}` with ldap server {1}", username, ldapConfiguration.getLdapUrlAsString()));
+            throw new cd.go.authentication.ldap.exception.LdapException(String.format("Failed to authenticate user `%s` with ldap server %s", username, ldapConfiguration.getLdapUrlAsString()));
         }
     }
 
@@ -82,9 +81,9 @@ public class ApacheDsLdapClient implements LdapClient {
         final BindRequest bindRequest = new BindRequestImpl()
                 .setName(userDn.getName())
                 .setCredentials(password)
-                .addControl(new PasswordPolicyDecorator(ldapApiService));
+                .addControl(new PasswordPolicyRequestImpl());
 
-        LOG.debug("Performing bind using userDn `{0}`.");
+        LOG.debug("Performing bind using userDn `{}`.", userDn.getName());
         return new AbstractPasswordPolicyResponder(ldapApiService) {
         }.process(() -> {
             try (LdapNetworkConnection ldapNetworkConnection = new LdapNetworkConnection(connectionConfig)) {
@@ -163,7 +162,7 @@ public class ApacheDsLdapClient implements LdapClient {
         final List<Entry> results = search(ldapConfiguration.getUserLoginFilter(), new String[]{username}, resultWrapper -> (Entry) resultWrapper.getResult(), 0);
 
         if (results.isEmpty()) {
-            throw new RuntimeException(format("User {0} does not exist in {1}", username, ldapConfiguration.getLdapUrlAsString()));
+            throw new RuntimeException(String.format("User %s does not exist in %s", username, ldapConfiguration.getLdapUrlAsString()));
         }
 
         if (results.size() > 1) {

@@ -19,7 +19,7 @@ apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-help
 
 gocdPlugin {
   id = 'cd.go.authentication.ldap'
-  pluginVersion = '2.3.0'
+  pluginVersion = '3.0.0'
   goCdVersion = '22.1.0'
   name = 'LDAP Authentication Plugin for GoCD'
   description = 'LDAP Authentication Plugin for GoCD'
@@ -71,8 +71,7 @@ configurations {
 
 ext {
   deps = [
-    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0',
-    apacheDs: 'org.apache.directory.server:apacheds-core:2.0.0.AM27',
+    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0'
   ]
 
   versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
@@ -81,10 +80,13 @@ ext {
 dependencies {
   compileOnly project.deps.gocdPluginApi
   implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.4'
-  implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '1.0.3'
+  implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '2.1.7'
   constraints {
-    implementation('org.apache.mina:mina-core:2.0.27') {
-      because "api-ldap-client-api use an older MINA 2.0 version"
+    implementation('org.apache.mina:mina-core:2.2.4') {
+      because 'api-ldap-client-api uses an older version with reported vulnerabilities'
+    }
+    implementation('org.apache.commons:commons-lang3:3.18.0') {
+      because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
   }
 
@@ -99,21 +101,15 @@ dependencies {
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
   testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
 
-  integrationTestImplementation group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.19.0'
   integrationTestImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
-  integrationTestImplementation project.deps.apacheDs
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-annotations', version: project.versions.apacheDs
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0-M24'
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-jndi', version: project.versions.apacheDs
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-constants', version: project.versions.apacheDs
-  integrationTestRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine'
+  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM27'
 }
 
 test {
   useJUnitPlatform()
 }
 
-task integrationTest(type: Test, description: 'Runs the ldap integration tests.', group: 'Verification') {
+tasks.register('integrationTest', Test) {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
 
