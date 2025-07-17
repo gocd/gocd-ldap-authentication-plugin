@@ -71,7 +71,8 @@ configurations {
 
 ext {
   deps = [
-    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0'
+    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0',
+    apacheDsApi: 'org.apache.directory.api:api-ldap-client-api:2.1.7',
   ]
 
   versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
@@ -80,7 +81,8 @@ ext {
 dependencies {
   compileOnly project.deps.gocdPluginApi
   implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.4'
-  implementation group: 'org.apache.directory.api', name: 'api-ldap-client-api', version: '2.1.7'
+  implementation project.deps.apacheDsApi
+  runtimeOnly group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: project.versions.apacheDsApi
   constraints {
     implementation('org.apache.mina:mina-core:2.2.4') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
