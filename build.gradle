@@ -90,6 +90,9 @@ dependencies {
     implementation('org.apache.commons:commons-lang3:3.18.0') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
+    implementation('com.github.ben-manes.caffeine:caffeine:3.2.2') {
+      because 'api-ldap-client-api uses v2 which still uses sun.misc.unsafe'
+    }
   }
 
   testImplementation project.deps.gocdPluginApi
