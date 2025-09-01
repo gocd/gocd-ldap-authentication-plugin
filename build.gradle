@@ -71,7 +71,7 @@ configurations {
 
 ext {
   deps = [
-    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0',
+    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.3.0',
     apacheDsApi: 'org.apache.directory.api:api-ldap-client-api:2.1.7',
   ]
 
@@ -80,7 +80,7 @@ ext {
 
 dependencies {
   compileOnly project.deps.gocdPluginApi
-  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.4'
+  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.5'
   implementation project.deps.apacheDsApi
   runtimeOnly group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: project.versions.apacheDsApi
   constraints {
@@ -96,9 +96,9 @@ dependencies {
   }
 
   testImplementation project.deps.gocdPluginApi
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.4'
   testImplementation platform('org.junit:junit-bom:5.13.4')
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
