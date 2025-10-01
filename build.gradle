@@ -86,7 +86,7 @@ dependencies {
     implementation('org.apache.mina:mina-core:2.2.4') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
-    implementation('org.apache.commons:commons-lang3:3.18.0') {
+    implementation('org.apache.commons:commons-lang3:3.19.0') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
     implementation('com.github.ben-manes.caffeine:caffeine:3.2.2') {
@@ -95,10 +95,10 @@ dependencies {
   }
 
   testImplementation project.deps.gocdPluginApi
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.20.0'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.4'
-  testImplementation platform('org.junit:junit-bom:5.13.4')
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
+  testImplementation platform('org.junit:junit-bom:6.0.0')
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
   testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
