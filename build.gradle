@@ -84,7 +84,7 @@ ext {
 
 dependencies {
   compileOnly project.deps.gocdPluginApi
-  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.0.5'
+  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.1.0'
   implementation project.deps.apacheDsApi
   runtimeOnly group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: project.versions.apacheDsApi
   constraints {
