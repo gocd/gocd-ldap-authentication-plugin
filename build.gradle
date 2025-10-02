@@ -84,9 +84,9 @@ ext {
 
 dependencies {
   compileOnly project.deps.gocdPluginApi
-  implementation group: 'cd.go.plugin.base', name: 'gocd-plugin-base', version: '1.1.0'
+  implementation 'cd.go.plugin.base:gocd-plugin-base:1.1.0'
   implementation project.deps.apacheDsApi
-  runtimeOnly group: 'org.apache.directory.api', name: 'api-ldap-codec-standalone', version: project.versions.apacheDsApi
+  runtimeOnly "org.apache.directory.api:api-ldap-codec-standalone:${project.versions.apacheDsApi}"
   constraints {
     implementation('org.apache.mina:mina-core:2.2.4') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
@@ -100,18 +100,18 @@ dependencies {
   }
 
   testImplementation project.deps.gocdPluginApi
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.20.0'
-  testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
+  testImplementation 'org.mockito:mockito-core:5.20.0'
+  testImplementation 'org.skyscreamer:jsonassert:1.5.3'
+  testImplementation 'org.assertj:assertj-core:3.27.6'
   testImplementation platform('org.junit:junit-bom:6.0.0')
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api'
+  testImplementation 'org.junit.jupiter:junit-jupiter-params'
   testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-  integrationTestImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
-  integrationTestImplementation group: 'org.apache.directory.server', name: 'apacheds-core-integ', version: '2.0.0.AM27'
+  integrationTestImplementation 'org.slf4j:slf4j-simple:2.0.5'
+  integrationTestImplementation 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27'
 }
 
 test {
