@@ -97,7 +97,7 @@ dependencies {
     implementation('org.apache.commons:commons-lang3:3.19.0') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
-    implementation('com.github.ben-manes.caffeine:caffeine:3.2.2') {
+    implementation('com.github.ben-manes.caffeine:caffeine:3.2.3') {
       because 'api-ldap-client-api uses v2 which still uses sun.misc.unsafe'
     }
   }
@@ -106,7 +106,7 @@ dependencies {
   testImplementation 'org.mockito:mockito-core:5.20.0'
   testImplementation 'org.skyscreamer:jsonassert:1.5.3'
   testImplementation 'org.assertj:assertj-core:3.27.6'
-  testImplementation platform('org.junit:junit-bom:6.0.0')
+  testImplementation platform('org.junit:junit-bom:6.0.1')
   testImplementation 'org.junit.jupiter:junit-jupiter-api'
   testImplementation 'org.junit.jupiter:junit-jupiter-params'
   testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
