@@ -94,7 +94,7 @@ dependencies {
     implementation('org.apache.mina:mina-core:2.2.4') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
-    implementation('org.apache.commons:commons-lang3:3.19.0') {
+    implementation('org.apache.commons:commons-lang3:3.20.0') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
     implementation('com.github.ben-manes.caffeine:caffeine:3.2.3') {
