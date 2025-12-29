@@ -80,6 +80,7 @@ ext {
   deps = [
     gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.3.0',
     apacheDsApi: 'org.apache.directory.api:api-ldap-client-api:2.1.7',
+    apacheDsServer: 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27',
   ]
 
   versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
@@ -113,8 +114,9 @@ dependencies {
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-  integrationTestImplementation 'org.slf4j:slf4j-simple:2.0.5'
-  integrationTestImplementation 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27'
+  implementation platform('org.slf4j:slf4j-bom:2.0.17')
+  integrationTestImplementation 'org.slf4j:slf4j-simple'
+  integrationTestImplementation project.deps.apacheDsServer
 }
 
 test {
