@@ -78,7 +78,7 @@ configurations {
 
 ext {
   deps = [
-    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.3.0',
+    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.4.0',
     apacheDsApi: 'org.apache.directory.api:api-ldap-client-api:2.1.7',
     apacheDsServer: 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27',
   ]
@@ -104,7 +104,7 @@ dependencies {
   }
 
   testImplementation project.deps.gocdPluginApi
-  testImplementation 'org.mockito:mockito-core:5.20.0'
+  testImplementation 'org.mockito:mockito-core:5.21.0'
   testImplementation 'org.skyscreamer:jsonassert:1.5.3'
   testImplementation 'org.assertj:assertj-core:3.27.6'
   testImplementation platform('org.junit:junit-bom:6.0.1')
