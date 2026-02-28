@@ -103,6 +103,15 @@ dependencies {
     }
   }
 
+  components {
+    // workaround for Caffeine metadata declaring dependencies that are not needed at runtime
+    withModule('com.github.ben-manes.caffeine:caffeine', { details ->
+      details.allVariants {
+        withDependencies { removeAll { it.name in ["jspecify", "error_prone_annotations"] } }
+      }
+    })
+  }
+
   testImplementation project.deps.gocdPluginApi
   testImplementation(testFixtures(project.deps.gocdPluginBase))
   testImplementation 'org.mockito:mockito-core:5.22.0'
