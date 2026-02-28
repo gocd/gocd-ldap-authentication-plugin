@@ -50,7 +50,6 @@ version = gocdPlugin.fullVersion(project)
 
 repositories {
   mavenCentral()
-  mavenLocal()
 }
 
 java {
@@ -78,8 +77,9 @@ configurations {
 
 ext {
   deps = [
-    gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.4.0',
-    apacheDsApi: 'org.apache.directory.api:api-ldap-client-api:2.1.7',
+    gocdPluginApi : 'cd.go.plugin:go-plugin-api:25.4.0',
+    gocdPluginBase: 'cd.go.plugin.base:gocd-plugin-base:2.0.0',
+    apacheDsApi   : 'org.apache.directory.api:api-ldap-client-api:2.1.7',
     apacheDsServer: 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27',
   ]
 
@@ -88,7 +88,7 @@ ext {
 
 dependencies {
   compileOnly project.deps.gocdPluginApi
-  implementation 'cd.go.plugin.base:gocd-plugin-base:1.1.1'
+  implementation project.deps.gocdPluginBase
   implementation project.deps.apacheDsApi
   runtimeOnly "org.apache.directory.api:api-ldap-codec-standalone:${project.versions.apacheDsApi}"
   constraints {
@@ -104,6 +104,7 @@ dependencies {
   }
 
   testImplementation project.deps.gocdPluginApi
+  testImplementation(testFixtures(project.deps.gocdPluginBase))
   testImplementation 'org.mockito:mockito-core:5.22.0'
   testImplementation 'org.skyscreamer:jsonassert:1.5.3'
   testImplementation 'org.assertj:assertj-core:3.27.7'
