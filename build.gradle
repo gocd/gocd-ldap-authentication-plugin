@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import org.gradle.api.plugins.jvm.JvmTestSuite
+
 plugins {
   id 'java'
 }
@@ -59,20 +61,6 @@ java {
 
 tasks.withType(JavaCompile).configureEach {
     options.release = 17
-}
-
-sourceSets {
-  integrationTest {
-    java.srcDirs = ['src/integration']
-    resources.srcDirs += ['src/testdata']
-    compileClasspath += sourceSets.main.output
-    runtimeClasspath += sourceSets.main.output
-  }
-}
-
-configurations {
-  integrationTestImplementation.extendsFrom testImplementation
-  integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 ext {
@@ -125,23 +113,36 @@ dependencies {
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   implementation platform('org.slf4j:slf4j-bom:2.0.18')
-  integrationTestImplementation 'org.slf4j:slf4j-simple'
-  integrationTestImplementation project.deps.apacheDsServer
 }
 
-test {
-  useJUnitPlatform()
+testing {
+  suites.named('test', JvmTestSuite).configure {
+    useJUnitJupiter()
+  }
+
+  suites.register('integrationTest', JvmTestSuite).configure {
+    useJUnitJupiter()
+    dependencies {
+      implementation project()
+      implementation 'org.slf4j:slf4j-simple'
+      implementation project.deps.apacheDsServer
+    }
+    targets.configureEach {
+      testTask.configure {
+        shouldRunAfter tasks.test
+      }
+    }
+  }
 }
 
-tasks.register('integrationTest', Test) {
-  testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
-
-  mustRunAfter tasks.test
-  useJUnitPlatform()
+configurations {
+  integrationTestImplementation.extendsFrom testImplementation
+  integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
-check.dependsOn integrationTest
+tasks.named('check') {
+  dependsOn testing.suites.integrationTest
+}
 
 jar {
   from(configurations.runtimeClasspath) {
