@@ -23,8 +23,8 @@ apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-help
 
 gocdPlugin {
   id = 'cd.go.authentication.ldap'
-  pluginVersion = '3.0.1'
-  goCdVersion = '22.1.0'
+  pluginVersion = '4.0.0'
+  goCdVersion = '24.1.0'
   name = 'LDAP Authentication Plugin for GoCD'
   description = 'LDAP Authentication Plugin for GoCD'
   vendorName = 'Thoughtworks, Inc.'
@@ -55,12 +55,12 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.release = 17
+    options.release = 21
 }
 
 ext {
