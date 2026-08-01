@@ -65,8 +65,8 @@ tasks.withType(JavaCompile).configureEach {
 
 ext {
   deps = [
-    gocdPluginApi : 'cd.go.plugin:go-plugin-api:25.4.0',
-    gocdPluginBase: 'cd.go.plugin.base:gocd-plugin-base:2.0.1',
+    gocdPluginApi : 'cd.go.plugin:go-plugin-api:26.1.0',
+    gocdPluginBase: 'cd.go.plugin.base:gocd-plugin-base:2.0.2',
     apacheDsApi   : 'org.apache.directory.api:api-ldap-client-api:2.1.8',
     apacheDsServer: 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27',
   ]
@@ -105,7 +105,7 @@ dependencies {
   testImplementation 'org.mockito:mockito-core:5.23.0'
   testImplementation 'org.skyscreamer:jsonassert:1.5.3'
   testImplementation 'org.assertj:assertj-core:3.27.7'
-  testImplementation platform('org.junit:junit-bom:6.1.1')
+  testImplementation platform('org.junit:junit-bom:6.1.2')
   testImplementation 'org.junit.jupiter:junit-jupiter-api'
   testImplementation 'org.junit.jupiter:junit-jupiter-params'
   testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.1.8'
