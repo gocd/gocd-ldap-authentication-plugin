@@ -23,7 +23,7 @@ apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-help
 
 gocdPlugin {
   id = 'cd.go.authentication.ldap'
-  pluginVersion = '4.0.0'
+  pluginVersion = '4.0.1'
   goCdVersion = '24.1.0'
   name = 'LDAP Authentication Plugin for GoCD'
   description = 'LDAP Authentication Plugin for GoCD'
@@ -77,8 +77,16 @@ ext {
 dependencies {
   compileOnly project.deps.gocdPluginApi
   implementation project.deps.gocdPluginBase
-  implementation project.deps.apacheDsApi
-  runtimeOnly "org.apache.directory.api:api-ldap-codec-standalone:${project.versions.apacheDsApi}"
+  implementation(project.deps.apacheDsApi) {
+    exclude module: 'api-ldap-schema-data' // Not needed for client-side use; only reachable via LdapConnection.loadSchema()
+    exclude module: 'api-ldap-extras-aci' // Not referenced by any other module in the dependency graph
+    exclude module: 'commons-codec'  // Only used by server-side password hashing (api-ldap-model PasswordUtil)
+    exclude module: 'commons-text'  // Only used by the PostalAddress schema syntax checker (api-util)
+  }
+  runtimeOnly("org.apache.directory.api:api-ldap-codec-standalone:${project.versions.apacheDsApi}") {
+    exclude module: 'commons-codec'
+    exclude module: 'commons-text'
+  }
   constraints {
     implementation('org.apache.mina:mina-core:2.2.9') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
