@@ -67,7 +67,7 @@ ext {
   deps = [
     gocdPluginApi : 'cd.go.plugin:go-plugin-api:26.1.0',
     gocdPluginBase: 'cd.go.plugin.base:gocd-plugin-base:2.0.2',
-    apacheDsApi   : 'org.apache.directory.api:api-ldap-client-api:2.1.8',
+    apacheDsApi   : 'org.apache.directory.api:api-ldap-client-api:2.1.9',
     apacheDsServer: 'org.apache.directory.server:apacheds-core-integ:2.0.0.AM27',
   ]
 
@@ -91,7 +91,7 @@ dependencies {
     implementation('org.apache.mina:mina-core:2.2.9') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
-    implementation('org.apache.commons:commons-lang3:3.20.0') {
+    implementation('org.apache.commons:commons-lang3:3.21.0') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
     implementation('com.github.ben-manes.caffeine:caffeine:3.3.0') {
