@@ -88,13 +88,13 @@ dependencies {
     exclude module: 'commons-text'
   }
   constraints {
-    implementation('org.apache.mina:mina-core:2.2.9') {
+    implementation('org.apache.mina:mina-core:2.2.10') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
     implementation('org.apache.commons:commons-lang3:3.21.0') {
       because 'api-ldap-client-api uses an older version with reported vulnerabilities'
     }
-    implementation('com.github.ben-manes.caffeine:caffeine:3.3.0') {
+    implementation('com.github.ben-manes.caffeine:caffeine:3.3.1') {
       because 'api-ldap-client-api uses v2 which still uses sun.misc.unsafe'
     }
   }
